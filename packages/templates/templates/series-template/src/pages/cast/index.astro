@@ -1,0 +1,71 @@
+---
+import {getEntry} from "astro:content";
+import Section from "@components/Section.astro"
+import Layout from "../../layouts/Layout.astro";
+import type {CastMember} from "../../content/config";
+import {createBreadcrumbListJsonLD, getPersonJsonLd} from "../../shared/json-ld-helpers";
+import Link from "../../components/Link.astro";
+import {getRouteByName} from "../../shared/links";
+import {RoutesName} from "../../types";
+
+const castEntry = await getEntry("cast", "cast");
+
+const actors = castEntry.data.cast.filter((member: CastMember) => member.category === 'actors' && member.name)
+const filmCrew = castEntry.data.cast.filter((member: CastMember) => member.category === 'film crew' && member.name)
+
+const text = castEntry.data.text
+const h1_title = castEntry.data.h1
+const title = castEntry.data.title ?? ''
+const description = castEntry.data.description
+---
+
+<Layout
+        url=`${import.meta.env.FULL_BASE_URL}${getRouteByName(RoutesName.FILM_CREW).href}`
+        title={title}
+        description={description}
+        jsonLd={{
+            "@context": "https://schema.org",
+            "@graph": [
+                createBreadcrumbListJsonLD([
+                    {
+                        name: "Главная",
+                        url: `${import.meta.env.FULL_BASE_URL}`
+                    },
+                    {
+                        name: "Актеры и съемочная группа",
+                        url: `${import.meta.env.FULL_BASE_URL}${getRouteByName(RoutesName.FILM_CREW).href}`
+                    }
+                ]),
+                {
+                    "@type": "ItemList",
+                    "name": "Актеры и съемочная группа",
+                    "url": `${import.meta.env.FULL_BASE_URL}${getRouteByName(RoutesName.FILM_CREW).href}`,
+                    "itemListElement": castEntry.data.cast.map(person => {
+                        return {
+                            "@type": "ListItem",
+                            "position": person.order || 0,
+                            "item": getPersonJsonLd(person)
+                        }
+                    })
+                }
+            ]
+        }}
+>
+    <section
+            class="bg-dark-bg text-white px-6 sm:px-8 md:px-12 lg:px-16 py-10 font-primary"
+    >
+        <nav class="text-secondary text-sm mb-8">
+            <Link href={getRouteByName(RoutesName.MAIN).href} class="hover:underline">
+                {getRouteByName(RoutesName.MAIN).title}
+            </Link> / Съёмочная группа
+        </nav>
+    </section>
+    <Section title="Съемочная группа" list={filmCrew}/>
+    <Section title="Актеры" list={actors}/>
+    <div class="py-2 sm:py-20 bg-[#1A222B]" >
+        <div class="container mx-auto px-4">
+            <h1 class="text-white/90 text-[30px] text-center">{h1_title}</h1>
+            <p class="text-white/90 text-lg leading-relaxed mx-auto mt-4" style="white-space: pre-wrap;">{text}</p>
+        </div>
+    </div>
+</Layout>

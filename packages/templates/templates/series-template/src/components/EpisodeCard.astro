@@ -1,0 +1,85 @@
+---
+import OptimizedImage from "./OptimizedImage.astro";
+import type { Episode } from "../content/config";
+import Link from "./Link.astro";
+import {routes} from "../shared/links";
+
+interface Props {
+  episode: Episode;
+  href?: string;
+}
+
+const { episode, href } = Astro.props;
+
+const episodeLink = href ?? `${routes.EPISODES.href}/${episode.slug}`;
+---
+
+<style>
+
+  .episode-card_description {
+      height: 142px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 7;
+      -webkit-box-orient: vertical;
+  }
+  @media screen and (max-width: 768px) {
+    .episode-card_description {
+      height: 114px;
+    }
+  }
+
+</style>
+
+<div
+  class="relative aspect-[3/4] bg-[#1A1721] rounded-xl overflow-hidden max-w-[280px] sm:max-w-[400px] mx-auto"
+>
+  <OptimizedImage
+    src={episode.thumbnail}
+    alt={episode.title}
+    class="w-full h-full object-cover"
+  />
+  <div
+    class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent"
+  >
+    <div class="absolute inset-x-0 bottom-0 p-3 sm:p-4 md:p-6">
+      <div class="flex items-center gap-3 mb-2 sm:mb-3">
+        <span
+          class="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded"
+        >
+          {episode.rating}
+        </span>
+        <span class="text-gray-400 text-xs sm:text-sm">
+          Серия {episode.id}
+        </span>
+        <span class="text-gray-400 text-xs sm:text-sm">
+          {episode.duration}
+        </span>
+      </div>
+      <h3 class="text-base sm:text-lg md:text-xl font-medium text-white mb-2">
+        {episode.h1 || episode.title}
+      </h3>
+      <p class="episode-card_description text-xs sm:text-sm text-gray-300 mb-3 sm:mb-4">
+        {episode.description}
+      </p>
+      <Link
+        href={episodeLink}
+        class="inline-flex items-center gap-2 text-white bg-secondary/20 hover:bg-secondary/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors text-sm"
+      >
+        Подробнее
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4 sm:w-5 sm:h-5"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"></path>
+        </svg>
+      </Link>
+    </div>
+  </div>
+</div>

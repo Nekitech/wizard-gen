@@ -1,11 +1,21 @@
 {
-  "name": "gsheets",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "echo 'Add dev script here'",
-    "build": "echo 'Add build script here'",
-    "test": "echo 'Add test script here'",
-    "lint": "echo 'Add lint script here'"
-  }
+	"name": "@wizard-gen/gsheets",
+	"type": "module",
+	"version": "0.0.0",
+	"private": true,
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "tsc --noEmit && tsup",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix"
+	},
+	"dependencies": {
+		"google-auth-library": "^9.15.1",
+		"google-spreadsheet": "^4.1.4"
+	},
+	"devDependencies": {
+		"@types/node": "^22.12.0"
+	}
 }

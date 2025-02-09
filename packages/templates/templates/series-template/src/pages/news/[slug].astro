@@ -1,0 +1,139 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getEntry } from "astro:content";
+import type { NewsItem } from "../../content/config";
+import Link from "../../components/Link.astro";
+import OptimizedImage from '@components/OptimizedImage.astro';
+import {createBreadcrumbListJsonLD, getNewsJsonLd} from "../../shared/json-ld-helpers";
+import {getRouteByName} from "../../shared/links";
+import {RoutesName} from "../../types";
+
+export async function getStaticPaths() {
+  const newsEntry = await getEntry("news", "news");
+  const { news }: { news: NewsItem[] } = newsEntry.data;
+
+  return news.map((item, ix , arr) => ({
+    params: { slug: item.slug },
+    props: {
+        item,
+        prevNew:  arr[(ix === 0) ? 0 : ix - 1]?.slug,
+        nextNew:  arr[(ix === arr.length - 1) ? arr.length - 1 : ix + 1]?.slug
+    },
+  }));
+}
+
+const item: NewsItem | undefined = Astro.props.item;
+
+
+const formatDescription = (description: string) =>
+  description
+    .split('\n\n')
+    .map(paragraph =>
+      `<p>${paragraph
+        .replace(/strong(.*?)strong/g, '<strong>$1</strong>')
+        .replace(/em(.*?)em/g, '<em>$1</em>')
+        .replace(/br/g, '<br>')
+        .replace(/h2(.*?)h2/g, '<h2 class="text-2xl font-bold mt-4 mb-2">$1</h2>')
+        .replace(/<a /g, '<a class="text-primary hover:underline" ')} </p>`
+    )
+    .join('');
+
+const prevNew: string | undefined = Astro.props.prevNew;
+const nextNew: string | undefined = Astro.props.nextNew;
+---
+
+<Layout
+    url=`${import.meta.env.FULL_BASE_URL}/news/${item.slug}/`
+    title={item.title || "Игра в кальмара 2"}
+    description={item.description}
+    jsonLd={{
+        "@context": "https://schema.org",
+        "@graph": [
+            createBreadcrumbListJsonLD([
+                {
+                    name: "Игра в кальмара",
+                    url: `${import.meta.env.FULL_BASE_URL}`
+                },
+                {
+                    name: item.title,
+                    url: `${import.meta.env.FULL_BASE_URL}${getRouteByName(RoutesName.NEWS).href}${item.slug}`
+                }
+            ]),
+            getNewsJsonLd(item)
+        ]
+    }}
+>
+  <section class="bg-dark-bg text-white px-4 sm:px-8 md:px-16 py-10 font-primary">
+    <nav class="text-secondary text-sm mb-8">
+      <Link href={getRouteByName(RoutesName.MAIN).href} class="hover:underline">
+          {getRouteByName(RoutesName.MAIN).title}
+      </Link> / {item.title}
+    </nav>
+
+    <div class="mb-6 news-grid">
+      <div class="w-full md:w-2/5 float-left md:mr-8 mb-2">
+        <div class="bg-card-bg w-full rounded-md mx-auto md:mx-0 col-span-1">
+          <div class="relative w-full h-[300px] overflow-hidden rounded-md">
+            <OptimizedImage
+              src={item.image}
+              alt={item.title}
+              class="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+        <p class="text-sm text-gray-400 mt-2 source-text">
+          Источник: {item.source}
+        </p>
+      </div>
+      <div class="md:col-span-2 px-4 sm:px-8 md:px-12 lg:px-0">
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-center md:text-left">
+          {(!item.h1) ? item.title: item.h1}
+        </h1>
+        <p class="text-sm text-gray-400 mb-4">Опубликовано: {item.date}</p>
+        <div class="mb-6 text-base-medium text-white text-center md:text-left" 
+          set:html={formatDescription(item.description)}
+        ></div>
+
+        <div class="flex flex-col md:flex-row justify-between text-primary gap-4 md:gap-10 mt-6 text-center md:text-left">
+          <Link href=`${getRouteByName(RoutesName.NEWS).href}${prevNew}/` class="hover:underline">← Назад</Link>
+          <Link href=`${getRouteByName(RoutesName.NEWS).href}${nextNew}/` class="hover:underline">Вперед →</Link>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+
+@media (max-width: 1070px) {
+  .news-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .news-grid > div {
+    width: 100%;
+    text-align: left;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  .news-grid .relative {
+    height: 550px;
+  }
+}
+@media (max-width: 1230px) {
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1240px) {
+  .source-text {
+    text-align: center;
+  }
+}
+</style>

@@ -1,0 +1,52 @@
+---
+import {getEntry} from "astro:content";
+import NewsSection from '@components/NewsSection.astro';
+import Layout from "../../layouts/Layout.astro";
+import {createBreadcrumbListJsonLD, getNewsJsonLd} from "../../shared/json-ld-helpers";
+import {getRouteByName} from "../../shared/links";
+import {RoutesName} from "../../types";
+
+const newsEntry = await getEntry("news", "news");
+
+const newsItems = newsEntry.data.news;
+const text = newsEntry.data.text;
+---
+
+<Layout
+        title="Новости"
+        url=`${import.meta.env.FULL_BASE_URL}${getRouteByName(RoutesName.NEWS).href}`
+        jsonLd={{
+            "@context": "https://schema.org",
+            "@graph": [
+                createBreadcrumbListJsonLD([
+                    {
+                        name: "Игра в кальмара",
+                        url: `${import.meta.env.FULL_BASE_URL}`
+                    },
+                    {
+                        name: "Новости",
+                        url: `${import.meta.env.FULL_BASE_URL}${getRouteByName(RoutesName.NEWS).href}`
+                    }
+                ]),
+                {
+                    "@type": "ItemList",
+                    "name": "Новости",
+                    "url": `${import.meta.env.FULL_BASE_URL}${getRouteByName(RoutesName.NEWS).href}`,
+                    "itemListElement": newsItems.map((item, index) => {
+                        return {
+                            "@type": "ListItem",
+                            "position": index + 1,
+                            "item": getNewsJsonLd(item)
+                        }
+                    })
+                }
+            ]
+        }}
+>
+    <div class="py-12 sm:py-20 bg-[#1A222B]">
+        <div class="container mx-auto px-4">
+            <p class="text-white/90 text-lg leading-relaxed mx-auto" style="white-space: pre-wrap;">{text}</p>
+        </div>
+    </div>
+    <NewsSection title="Новости" list={newsItems}/>
+</Layout>

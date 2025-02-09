@@ -1,15 +1,20 @@
 {
-  "name": "cli",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "echo 'Add dev script here'",
-    "build": "echo 'Add build script here'",
-    "test": "echo 'Add test script here'",
-    "lint": "echo 'Add lint script here'"
-  },
-  "dependencies": {
-    "chatgpt": "workspace:*",
-    "gsheets": "workspace:*"
-  }
+	"name": "cli",
+	"type": "module",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "echo 'Add dev script here'",
+		"build": "echo 'Add build script here'",
+		"test": "echo 'Add test script here'",
+		"lint:fix": "eslint . --fix",
+		"lint": "eslint .",
+		"install_packets": "pnpm install"
+	},
+	"dependencies": {
+		"@inquirer/prompts": "^7.2.4",
+		"@wizard-gen/chatgpt": "workspace:*",
+		"@wizard-gen/gsheets": "workspace:*",
+		"@wizard-gen/templates": "workspace:*"
+	}
 }

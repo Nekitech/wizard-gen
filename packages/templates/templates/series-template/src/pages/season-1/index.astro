@@ -1,0 +1,51 @@
+---
+import { getEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import EpisodeCard from "../../components/EpisodeCard.astro";
+import {createBreadcrumbListJsonLD, getSeasonJsonLd} from "../../shared/json-ld-helpers";
+
+const episodesCollection = await getEntry("episodes", "episodes")
+const {title, description, episodes, keywords, url} = episodesCollection.data.season_1
+const currSeason = 1;
+
+---
+<Layout
+    url=`${import.meta.env.FULL_BASE_URL}${url}`
+    title={title}
+    description={description}
+    keywords={keywords}
+    jsonLd={{
+      "@context": "https://schema.org",
+        "@graph": [
+            createBreadcrumbListJsonLD([
+                {
+                    name: "Игра в кальмара",
+                    url: `${import.meta.env.FULL_BASE_URL}`
+                },
+                {
+                    name: `Сезон ${currSeason}`,
+                    url: `${import.meta.env.FULL_BASE_URL}${url}`
+                }
+            ]),
+            getSeasonJsonLd(episodes, currSeason)
+        ]
+    }}
+>
+<section class="py-12 sm:py-20 bg-[#1A222B]" aria-labelledby="cast-heading">
+  <div class="container mx-auto px-4">
+    <h2
+      id="cast-heading"
+      class="text-2xl sm:text-3xl font-medium mb-8 sm:mb-16 text-center"
+    >
+      Сезон {currSeason}
+    </h2>
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto"
+    >
+      {episodes?.map((episode) => (
+        <EpisodeCard episode={episode} href={episode.url}/>
+      ))}
+    </div>
+  </div>
+</section>
+</Layout>

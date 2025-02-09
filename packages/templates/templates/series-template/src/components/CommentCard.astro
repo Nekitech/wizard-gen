@@ -1,0 +1,27 @@
+---
+import OptimizedImage from './OptimizedImage.astro';
+import DefaultAvatar from '../assets/default_avatar.png'
+
+interface Props {
+  user?: {
+    avatar?: any;
+    name: string;
+  };
+  text?: string;
+}
+const defaultUser = {
+    avatar: DefaultAvatar,
+    name: "User"
+};
+const defaultText = "Съешь ещё этих мягких французских булок, да выпей чаю!"
+const { user=defaultUser, text=defaultText } = Astro.props;
+---
+<div class="bg-card-bg p-6 font-primary text-white rounded-lg">
+    <div class="user flex items-center gap-5 mb-5">
+        <OptimizedImage src={user.avatar || DefaultAvatar} alt="user-avatar" width={60}/>
+        <h3 class="font-bold text-lg">{user.name}</h3>
+    </div>
+    <p class="comment-text text-sm tracking-wider">
+        {text}
+    </p>
+</div>

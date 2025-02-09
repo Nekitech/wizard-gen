@@ -1,0 +1,26 @@
+{
+	"extends": "astro/tsconfigs/strictest",
+
+	"compilerOptions": {
+		"target": "ES2022",
+		"lib": ["es6", "ESNext", "ES2015", "DOM", "DOM.Iterable"],
+		"useDefineForClassFields": true,
+		"baseUrl": ".",
+		"paths": {
+		  "@components/*": ["src/components/*"],
+		  "@layouts/*": ["src/layouts/*"]
+		},
+		"exactOptionalPropertyTypes": false,
+		"newLine": "lf",
+		"noEmitHelpers": true,
+		"outDir": "dist",
+		"removeComments": false,
+		"allowSyntheticDefaultImports": true
+	},
+	"include": [
+		"src/**/*.d.ts",
+		"src/**/*.ts",
+		"src/**/*.astro"
+	  ],
+	"exclude": ["**/node_modules", "**/dist"]
+}

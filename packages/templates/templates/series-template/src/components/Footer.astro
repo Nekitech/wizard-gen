@@ -1,0 +1,127 @@
+---
+import { getEntry } from "astro:content";
+import type { Footer } from "../content/config";
+import Link from "./Link.astro";
+import {getFooterLinks, routes} from "../shared/links";
+import VKLogo from '../assets/svg/logo_vk.svg';
+import TGLogo from '../assets/svg/logo_tg.svg';
+import OptimizedImage from "./OptimizedImage.astro";
+
+const footerContent = await getEntry("footer", "footer");
+const episodesContent = await getEntry('episodes', "episodes")
+const castContent = await getEntry('cast', 'cast')
+
+const season_1 = episodesContent.data.season_1.episodes
+const season_2 = episodesContent.data.season_2.episodes
+
+const cast = castContent.data.cast
+
+const { legalText }: Footer = footerContent.data;
+const currentYear = new Date().getFullYear();
+---
+<footer class="bg-[#151B22] text-white py-8">
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-flow-col gap-10 grid-flow-row auto-rows-auto">
+      <div class="text-center md:text-left">
+                <h3 class="text-base font-semibold mb-4 text-secondary">
+                  Навигация
+                </h3>
+                <ul class="space-y-2 mt-3">
+                  {
+                    getFooterLinks(routes).map((item) => (
+                      <li>
+                        <Link
+                          href={item.href}
+                          class="text-gray-300 hover:text-white transition-colors duration-200"
+                        >
+                          {item.title}
+                        </Link>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+      <div class="text-center md:text-left">
+        <h3 class="text-base font-semibold mb-4 text-secondary">
+          Съемочная группа
+        </h3>
+        <ul class="space-y-2 mt-3">
+          {
+            cast.map((item) => (
+              <li>
+                <Link
+                  href={item.url}
+                  class="text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  {item.name}
+                </Link>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div class="text-center md:text-left">
+            <h3 class="text-base font-semibold mb-4 text-secondary">
+              Сезон 1
+            </h3>
+            <ul class="space-y-2 mt-3">
+              {
+                season_1.map((episode) => (
+                  <li>
+                    <Link
+                      href={episode.url}
+                      class="text-gray-300 hover:text-white transition-colors duration-200"
+                    >
+                      "{episode.h1}"
+                    </Link>
+                  </li>
+                ))
+              }
+                </ul>
+      </div>
+         <div class="text-center md:text-left">
+            <h3 class="text-base font-semibold mb-4 text-secondary">
+              Сезон 2
+            </h3>
+            <ul class="space-y-2 mt-3">
+              {
+                season_2.map((episode) => (
+                  <li>
+                    <Link
+                      href={episode.url}
+                      class="text-gray-300 hover:text-white transition-colors duration-200"
+                    >
+                      "{(!episode.h1) ? episode.title: episode.h1}"
+                    </Link>
+                  </li>
+                ))
+              }
+                </ul>
+      </div>
+      <div class="text-center md:text-left">
+        <h3 class="text-base font-semibold mb-4 text-secondary">
+          Правовая информация
+        </h3>
+        <div class="text-gray-300 space-y-2 mt-3">
+          {
+            legalText
+              .split("\n\n")
+              .map((paragraph) => (
+                <p class="leading-relaxed text-xs">{paragraph}</p>
+              ))
+          }
+        </div>
+        <div class="mt-5 flex gap-3 md:justify-start justify-center">
+          <a href="https://vk.com/public216134603" class="inline"><OptimizedImage src={VKLogo} width={30} alt="logo_vk" class="logo transition duration-200 opacity-80 hover:opacity-100"/></a>
+          <a href="https://t.me/igravkalmaradva" class="inline"><OptimizedImage src={TGLogo} width={30} alt="logo_tg" class="logo transition opacity-80 hover:opacity-100"/></a>
+        </div>
+      </div>
+    </div>
+    <div
+      class="mt-8 pt-4 border-t border-gray-800 text-center text-xs text-gray-400"
+    >
+      &copy; {currentYear} Игра в кальмара 2. Все права защищены.
+    </div>
+  </div>
+</footer>
+

@@ -1,0 +1,114 @@
+---
+import { getEntry } from "astro:content";
+import "swiper/css";
+import "swiper/css/navigation";
+import BackgroundPattern from "../../components/BackgroundPattern.astro";
+
+import EpisodeCard from "../../components/EpisodeCard.astro";
+import type { Episode } from "../../content/config";
+
+import { routes } from "../../shared/links";
+
+const episodes = await getEntry("episodes", "episodes");
+
+
+const s1_episodes: Episode[] = episodes.data.season_1.episodes;
+const s2_episodes: Episode[] = episodes.data.season_2.episodes;
+---
+
+<section
+  class="py-8 sm:py-20 relative overflow-hidden bg-[#1A222B]"
+  id="episodes"
+>
+  <BackgroundPattern />
+
+  <div class="container mx-auto relative z-10">
+    <h2
+      class="text-3xl md:text-4xl font-medium mb-8 sm:mb-12 text-center text-white px-4"
+    >
+      Эпизоды
+    </h2>
+
+    <div class="swiper episodes-slider px-4">
+      <div class="swiper-wrapper">
+        {
+          s1_episodes.map((episode) => (
+            <div class="swiper-slide">
+              <EpisodeCard episode={episode} href={`/${routes.SEASON_1.href}/${episode.slug}/`}/>
+            </div>
+          ))
+        }
+        {
+          s2_episodes.map((episode) => (
+            <div class="swiper-slide">
+              <EpisodeCard episode={episode} href={`/${routes.SEASON_2.href}/${episode.slug}/`}/>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="swiper-button-prev !text-white"></div>
+      <div class="swiper-button-next !text-white"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import Swiper from "swiper";
+  import { Navigation } from "swiper/modules";
+
+  function initSwiper() {
+    new Swiper(".episodes-slider", {
+      modules: [Navigation],
+      slidesPerView: 1,
+      spaceBetween: 24,
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+      breakpoints: {
+        640: {
+          slidesPerView: 2,
+        },
+        768: {
+          slidesPerView: 3,
+        },
+        1024: {
+          slidesPerView: 4,
+        },
+      },
+    });
+  }
+
+  // Инициализация при загрузке страницы
+  document.addEventListener("astro:page-load", initSwiper);
+  // Резервная инициализация, если astro:page-load не сработает
+  document.addEventListener("DOMContentLoaded", initSwiper);
+</script>
+
+<style>
+  @keyframes slow-move {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 100% 100%;
+    }
+  }
+
+  .animate-slow-move {
+    animation: slow-move 60s linear infinite alternate;
+  }
+
+  .swiper-button-next::after,
+  .swiper-button-prev::after {
+    font-size: 24px;
+  }
+
+  .swiper-button-next,
+  .swiper-button-prev {
+    @media (max-width: 640px) {
+      display: none;
+    }
+  }
+</style>

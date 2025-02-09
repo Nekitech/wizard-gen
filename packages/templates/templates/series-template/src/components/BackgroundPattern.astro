@@ -1,0 +1,36 @@
+---
+import backgroundImage from "../assets/ps5-bg.png";
+
+interface Props {
+  opacity?: number;
+  className?: string;
+}
+
+const { className = "" }: Props = Astro.props;
+---
+
+<div
+  class:list={["absolute inset-0 z-0 bg-repeat animate-slow-move", className]}
+  style={`
+    background-image: url(${backgroundImage.src}); 
+    background-size: 600px;
+    background-position: center;
+
+  `}
+>
+</div>
+
+<style>
+  @keyframes slow-move {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 100% 100%;
+    }
+  }
+
+  .animate-slow-move {
+    animation: slow-move 60s linear infinite alternate;
+  }
+</style>

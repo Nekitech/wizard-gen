@@ -1,0 +1,72 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Hero from "../widgets/index/hero.astro";
+import Episodes from "../widgets/index/episodes.astro";
+import Cast from "../widgets/index/cast.astro";
+import Interactive from "../widgets/index/quiz.astro";
+import News from "../widgets/index/news.astro";
+import {getEntry} from "astro:content";
+import {createBreadcrumbListJsonLD, getNewsJsonLd, getPersonJsonLd, getSeasonJsonLd} from "../shared/json-ld-helpers";
+
+const episodes = await getEntry("episodes", "episodes");
+const newsEntry = await getEntry("news", "news");
+const castEntry = await getEntry("cast", "cast");
+const main = await getEntry("main", "main");
+const mainContent = main.data
+---
+
+<Layout title={mainContent.title ?? "Игра в кальмара 2"}
+    url=`${import.meta.env.FULL_BASE_URL}`
+        description={mainContent.description}
+        jsonLd={{
+    "@context": "https://schema.org",
+    "@graph": [
+        createBreadcrumbListJsonLD([
+            {
+                name: "Главная",
+                url: `${import.meta.env.FULL_BASE_URL}`
+            }
+        ]),
+        {
+            "@type": "TVSeries",
+            "name": "Игра в кальмара",
+            "genre": ["выживание", "приключенческий боевик", "триллер", "драма"],
+            "contentRating": "18+",
+            "numberOfSeasons": 2,
+            "containsSeason": [
+                getSeasonJsonLd(episodes.data.season_1.episodes, 1),
+                getSeasonJsonLd(episodes.data.season_2.episodes, 2)
+            ]
+        },
+        {
+            "@type": "ItemList",
+            "name": "Актеры и съемочная группа",
+            "url": `${import.meta.env.FULL_BASE_URL}/cast`,
+            "itemListElement": castEntry.data.cast.map(actor => {
+                return {
+                    "@type": "ListItem",
+                    "position": actor.order || 0,
+                    "item": getPersonJsonLd(actor)
+                }
+            })
+        },
+        {
+            "@type": "ItemList",
+            "name": "Новости",
+            "itemListElement": newsEntry.data.news.map(item => {
+                return {
+                    "@type": "ListItem",
+                    "item": getNewsJsonLd(item)
+                }
+            })
+        }
+    ]
+}}>
+  <main>
+    <Hero />
+    <Episodes />
+    <Cast />
+    <Interactive />
+    <News />
+  </main>
+</Layout>

@@ -1,0 +1,53 @@
+---
+import type { ImageOutputFormat, ImageMetadata } from "astro";
+
+import { Picture } from "astro:assets";
+
+interface Props {
+  src: ImageMetadata; // Changed to only accept ImageMetadata
+  alt: string;
+  width?: number;
+  height?: number;
+  class?: string;
+  formats?: ImageOutputFormat[];
+  quality?: number;
+  loading?: "lazy" | "eager";
+  decoding?: "async" | "sync" | "auto";
+}
+
+const {
+  src,
+  alt,
+  width = 800,
+  height = 600,
+  class: className = "",
+  formats = ["webp", "avif"],
+  quality = 80,
+  loading = "lazy",
+  decoding = "async",
+} = Astro.props;
+
+// Стандартные размеры для srcset
+const sizes = [300, 600, 900, 1200];
+
+// Генерация srcset
+const srcset = sizes.map((size) => `${src.src}?w=${size} ${size}w`).join(", ");
+
+// Стандартные sizes
+const defaultSizes =
+  "(max-width: 640px) 300px, (max-width: 1024px) 600px, 900px";
+---
+
+<Picture
+  src={src}
+  {alt}
+  {width}
+  {height}
+  sizes={defaultSizes}
+  srcset={srcset}
+  {loading}
+  {decoding}
+  class={className}
+  {quality}
+  {formats}
+/>

@@ -1,0 +1,177 @@
+---
+import { Image } from "astro:assets";
+
+import burger_icon from "../../public/burger.svg";
+import {RoutesName} from "../types";
+import type {TRoutes} from "../types";
+import Link from "./Link.astro";
+import {getHeaderLinks, getRouteByName} from "../shared/links";
+interface Props {
+  routes: TRoutes;
+
+}
+
+const { routes } = Astro.props;
+---
+
+<style>
+  /* Мобильные стили */
+  .burger-menu {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: none;
+    z-index: 9999;
+  }
+
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none;
+    }
+
+    .burger-menu {
+      display: block;
+    }
+
+    /* Полноэкранное меню на мобильных */
+    .mobile-menu.open {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+    }
+
+    .mobile-menu a {
+      font-size: 1.5rem;
+      margin: 1rem 0;
+      color: white;
+      text-decoration: none;
+      max-width: 90%; /* Ограничение ширины текста */
+      word-wrap: break-word;
+    }
+  }
+
+  @media (max-width: 768px) {
+    #logo path,
+    #logo circle,
+    #logo rect {
+      stroke: #e53b7e; /* Новый цвет иконки для мобильной версии */
+    }
+  }
+</style>
+
+<header
+  class=`
+    w-full 
+
+    text-white 
+    flex 
+    items-center 
+    justify-between 
+    px-6 
+    py-5 
+    gap-x-4
+    lg:gap-x-[230px]
+    md:justify-center
+    md:px-10`
+>
+  <Link id="logo" href={getRouteByName(RoutesName.MAIN).href}>
+    <svg
+      width="108"
+      height="34"
+      viewBox="0 0 108 34"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g filter="url(#filter0_d_1_11)">
+        <path
+          d="M7.74167 23.5L19 4L30.2583 23.5H7.74167Z"
+          stroke="white"
+          stroke-width="4"></path>
+        <circle
+          cx="55.8868"
+          cy="12.8302"
+          r="10.8302"
+          stroke="white"
+          stroke-width="4"></circle>
+        <rect
+          x="79.6981"
+          y="2"
+          width="21.6604"
+          height="21.6604"
+          stroke="white"
+          stroke-width="4"></rect>
+      </g>
+    </svg>
+  </Link>
+
+  <nav class={`hidden z-10 md:flex gap-6`}>
+    {
+      getHeaderLinks(routes).map((link) => (
+        <Link href={link.href} class="hover:underline">
+          {link.title}
+        </Link>
+      ))
+    }
+  </nav>
+
+  <Image
+    id={"burger"}
+    width={34}
+    height={34}
+    src={burger_icon}
+    class="md:hidden z-10"
+    alt="burger"
+  />
+
+  <!-- Полноэкранное мобильное меню -->
+  <div id="mobileMenu" class="mobile-menu z-[9999] bg-secondary">
+    <button id="close" aria-label="Close menu">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-8 w-8"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+
+    {getHeaderLinks(routes).map((link) => <Link href={link.href}>{link.title}</Link>)}
+  </div>
+</header>
+
+<script is:inline>
+  const burgerButton = document.getElementById("burger");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const closeButton = document.getElementById("close");
+
+  const handleOpen = () => {
+    mobileMenu.classList.add("open");
+  };
+
+  const handleClose = () => {
+    mobileMenu.classList.remove("open");
+  };
+
+  burgerButton.addEventListener("click", handleOpen);
+
+  closeButton.addEventListener("click", handleClose);
+
+  mobileMenu.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", handleClose);
+  });
+</script>

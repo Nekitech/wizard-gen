@@ -1,0 +1,152 @@
+---
+import CommentCard from '../components/CommentCard.astro';
+import { type Comment } from '../content/config'
+import '../styles/loader.css';
+
+interface Props {
+    comments?: Comment[];
+}
+
+const { comments = [] } = Astro.props;
+---
+<section
+class="bg-dark-bg text-white   py-10 font-primary">
+    <div class="title mt-5 mb-5 flex items-start gap-2">
+        <h1 class="text-secondary text-3xl inline">Комментарии</h1>
+        {comments && comments.length > 0 && <span>({comments.length})</span>}
+    </div>
+    <h4 class="text-lg mt-4 mb-4 tracking-wider">Оставить комментарий</h4>
+    <form class="create-comment-block grid grid-cols-1 md:grid-cols-4 md:gap-x-5 gap-y-5 mb-5 mt-5 relative">
+        <div class="flex flex-col gap-3 order-last md:order-1">
+            <div class="form-group">
+                <input type="text" required name="name" id="name" placeholder="Ваше имя *" maxlength="50" tabindex="1"
+                class="w-full p-3 rounded-md bg-card-bg border-secondary/50 border-2 focus:outline-none focus:ring-1 focus:ring-primary">
+                <label for="name" id="name-label" class="text-xs p-0 m-0 text-primary"></label>
+            </div>
+            <button type="button" id='submit-button' 
+            class="bg-secondary border-primary/50 rounded-lg p-3 text-lg tracking-wider hover:ring-1 hover:ring-white"
+            tabindex="3">
+                Отправить
+            </button>
+        </div>
+        <div class="form-group order-2 md:order-1 col-span-3 flex flex-col gap-2">
+            <textarea required name="comment" id="comment" cols="30" rows="5" placeholder="Ваш комментарий... *" maxlength="5000" tabindex="2"
+            class="p-4 w-full h-full bg-card-bg border-secondary/50 border-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
+            <label for="comment" id="comment-label" class="text-xs p-0 m-0 text-primary"></label>
+        </div>
+        <div class="w-full h-full bg-dark-bg absolute flex flex-col justify-center items-center transition duration-500 opacity-0 hidden" id="loader">
+            <span class="loader"></span>
+            <p class="text-xs mt-2">Сохраняем ваш комментарий...</p>
+        </div>
+    </form>
+    <div class="confirm-block hidden" id="confirm-block">
+        <h2 class="text-lg text-green-400 text-center mt-5 mb-5">Ваш комментарий отправлен на модерацию!</h2>
+    </div>
+    <div class="invalid-block hidden" id="invalid-block">
+        <h2 class="text-lg text-primary text-center mt-5 mb-5">Заполните все поля!</h2>
+    </div>
+    <div class="comments flex flex-col gap-3">
+        {comments.map((c:Comment) => <CommentCard {...c} />)}
+    </div>
+</section>
+
+<script>
+    const nameInput = document.getElementById('name') as HTMLInputElement;
+    const commentInput = document.getElementById('comment') as HTMLInputElement;
+    const nameInputLabel = document.getElementById('name-label') as HTMLElement;
+    const commentInputLabel = document.getElementById('comment-label') as HTMLElement;
+    const loader = document.getElementById('loader');
+
+    document.getElementById('submit-button')?.addEventListener('click', () => { 
+        resetForm();
+        
+        const nameValidation = validateName(nameInput);
+        const commentValidation = validateComment(commentInput);
+        if(!nameValidation.valid || !commentValidation.valid) {
+            
+            if(!nameValidation.valid) {
+                nameInputLabel.innerText = nameValidation.errorText;
+                nameInput.classList.remove('border-secondary/50');
+                nameInput.classList.add('border-primary');
+            }
+            if(!commentValidation.valid) {
+                commentInputLabel.innerText = commentValidation.errorText;
+                commentInput.classList.remove('border-secondary/50');
+                commentInput.classList.add('border-primary');
+            }
+            document.getElementById('invalid-block')?.classList.remove('hidden');
+        }
+        else { 
+            nameInput.value = '';
+            commentInput.value = '';
+            
+            loader?.classList.remove('hidden');
+            loader?.classList.remove('opacity-0');
+            loader?.classList.add('opacity-100');
+            setTimeout(() => {
+                document.getElementById('confirm-block')?.classList.remove('hidden')
+                loader?.classList.add('opacity-0');
+                loader?.classList.remove('opacity-100');
+                setTimeout(() => {
+                    loader?.classList.add('hidden');
+                }, 500)
+            }, 1500)
+        }
+    })
+
+    function validateName(input: HTMLInputElement | null) {
+
+        if(input == null || input.value == '') {
+            return {
+                valid: false,
+                errorText: 'Введите имя!'
+            }
+        }
+
+        if(input.value.length > 50) {
+            return { 
+                valid: false,
+                errorText: 'Имя должно быть меньше 50 символов'
+            }
+        }
+
+        return { 
+            valid: true,
+            errorText: ''
+        }
+    }
+
+
+    function validateComment(input: HTMLInputElement | null) {
+        if(input == null || input.value == '') {
+            return {
+                valid: false,
+                errorText: 'Введите текст комментария!'
+            }
+        }
+
+        if(input.value.length > 5000) {
+            return { 
+                valid: false,
+                errorText: 'Комментарий должен быть меньше 5000 символов'
+            }
+        }
+
+        return { 
+            valid: true,
+            errorText: ''
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('invalid-block')?.classList.add('hidden');
+        document.getElementById('confirm-block')?.classList.add('hidden');
+        nameInputLabel.innerText = '';
+        commentInputLabel.innerText = '';
+        nameInput.classList.add('border-secondary/50');
+        nameInput.classList.remove('border-primary');
+        commentInput.classList.add('border-secondary/50');
+        commentInput.classList.remove('border-primary');
+    }
+</script>
+

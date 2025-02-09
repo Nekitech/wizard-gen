@@ -1,0 +1,190 @@
+---
+import { getEntry } from "astro:content";
+
+import BackgroundPattern from "../../components/BackgroundPattern.astro";
+import type { QuizSchema } from "../../content/config";
+import OptimizedImage from "../../components/OptimizedImage.astro";
+
+const quizEntry = await getEntry("quiz", "quiz");
+const { title, description, questions, image }: QuizSchema = quizEntry.data;
+---
+
+<section class="py-8 sm:py-20 relative overflow-hidden bg-[#1A222B]">
+  <BackgroundPattern />
+  <div class="container mx-auto px-4 relative z-10">
+    <h2 class="text-2xl sm:text-3xl font-medium mb-4 sm:mb-8 text-center">
+      {title}
+    </h2>
+    <p class="text-gray-400 text-sm sm:text-base text-center mb-8 sm:mb-12">
+      {description}
+    </p>
+    <div
+      class="quiz-container max-w-4xl mx-auto"
+      data-questions={JSON.stringify(questions)}
+    >
+      <div class="flex flex-col md:flex-row gap-6 sm:gap-8 items-center">
+        <div class="w-full md:w-1/2">
+          <div
+            class="quiz-content min-h-[300px] sm:min-h-[400px] flex justify-center items-center"
+          >
+            <!-- Контент вопросов будет добавляться через JavaScript -->
+          </div>
+        </div>
+        <div class="w-full md:w-1/2 sticky top-8">
+          <OptimizedImage
+            src={image}
+            alt="Изображение теста"
+            width={500}
+            height={400}
+            class="rounded-lg w-full"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  class Quiz {
+    private questions: any[];
+    private currentQuestion: number = 0;
+    private container: HTMLElement;
+    private score: number = 0;
+
+    constructor(container: HTMLElement, questions: any[]) {
+      this.container = container.querySelector(".quiz-content")!;
+      this.questions = questions;
+      this.showQuestion();
+    }
+
+    private showQuestion() {
+      const question = this.questions[this.currentQuestion];
+      const template = `
+        <div class="quiz-question min-h-[300px] sm:min-h-[400px] flex flex-col justify-center">
+          <h3 class="text-lg sm:text-xl mb-4 sm:mb-6">
+            <span class="text-[#FF0066]">Вопрос ${this.currentQuestion + 1}:</span> ${question.question}
+          </h3>
+          <div class="space-y-2 sm:space-y-3">
+            ${question.options
+              .map(
+                (option: any, index: number) => `
+              <label class="flex items-center gap-3 p-2 sm:p-3 rounded bg-white/5 hover:bg-white/10 cursor-pointer transition-colors">
+                <input 
+                  type="radio" 
+                  name="question${question.id}" 
+                  value="${index}"
+                  class="w-4 h-4 accent-[#FF0066]"
+                >
+                <span class="text-sm sm:text-base text-white/90">${option.text}</span>
+              </label>
+            `
+              )
+              .join("")}
+          </div>
+          <button 
+            class="next-question mt-4 sm:mt-6 px-4 sm:px-6 py-2 bg-secondary text-white text-sm sm:text-base rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/90 transition-colors"
+            disabled
+          >
+            ${
+              this.currentQuestion === this.questions.length - 1
+                ? "Завершить тест"
+                : "Следующий вопрос →"
+            }
+          </button>
+        </div>
+      `;
+
+      this.container.innerHTML = template;
+      this.addEventListeners();
+    }
+
+    private addEventListeners() {
+      const radioInputs = this.container.querySelectorAll(
+        'input[type="radio"]'
+      );
+      const nextButton = this.container.querySelector(
+        ".next-question"
+      ) as HTMLButtonElement;
+
+      radioInputs.forEach((input) => {
+        input.addEventListener("change", () => {
+          nextButton.disabled = false;
+        });
+      });
+
+      nextButton.addEventListener("click", () => {
+        const selectedInput = this.container.querySelector(
+          'input[type="radio"]:checked'
+        ) as HTMLInputElement;
+        const question = this.questions[this.currentQuestion];
+
+        if (question.options[Number(selectedInput.value)].isCorrect) {
+          this.score++;
+        }
+
+        this.currentQuestion++;
+
+        if (this.currentQuestion < this.questions.length) {
+          this.showQuestion();
+        } else {
+          this.showResults();
+        }
+      });
+    }
+
+    private showResults() {
+      const percentage = (this.score / this.questions.length) * 100;
+      let message = "";
+
+      if (percentage === 100) {
+        message = "Отлично! Вы настоящий фанат сериала!";
+      } else if (percentage >= 70) {
+        message = "Хороший результат! Вы хорошо знаете сериал.";
+      } else if (percentage >= 40) {
+        message = "Неплохо! Но есть куда расти.";
+      } else {
+        message = "Похоже, вам стоит пересмотреть сериал.";
+      }
+
+      const template = `
+        <div class="quiz-results min-h-[300px] sm:min-h-[400px] flex flex-col justify-center">
+          <div class="text-center">
+            <h3 class="text-xl sm:text-2xl mb-3 sm:mb-4 text-white">Тест завершен!</h3>
+            <p class="text-lg sm:text-xl mb-3 sm:mb-4 text-white/90">
+              Ваш результат: ${this.score} из ${this.questions.length} (${percentage}%)
+            </p>
+            <p class="text-base sm:text-lg mb-6 sm:mb-8 text-white/80">${message}</p>
+            <button 
+              class="restart-quiz px-4 sm:px-6 py-2 bg-[#FF0066] text-white text-sm sm:text-base rounded hover:bg-[#FF0066]/90 transition-colors"
+            >
+              Пройти тест заново
+            </button>
+          </div>
+        </div>
+      `;
+
+      this.container.innerHTML = template;
+
+      const restartButton = this.container.querySelector(".restart-quiz");
+      restartButton?.addEventListener("click", () => {
+        this.currentQuestion = 0;
+        this.score = 0;
+        this.showQuestion();
+      });
+    }
+  }
+
+  // Инициализация теста
+  document.querySelectorAll(".quiz-container").forEach((container) => {
+    const questions = JSON.parse(
+      container.getAttribute("data-questions") || "[]"
+    );
+    new Quiz(container as HTMLElement, questions);
+  });
+</script>
+
+<style>
+  .quiz-container {
+    transition: height 0.3s ease;
+  }
+</style>
