@@ -1,9 +1,10 @@
-import path from 'node:path';
-import { input, select, Separator } from '@inquirer/prompts';
-import { startTemplateByName } from '@wizard-gen/templates';
+import { select, Separator } from '@inquirer/prompts';
+import { generate_project } from './src/functions/generate_project';
+import { gsheets_api } from './src/functions/gsheets_api';
 
-await select({
+select({
 	message: 'Choose the function of wyzard',
+	loop: false,
 	choices: [
 		{
 			name: 'Generation of the site on the template',
@@ -12,7 +13,6 @@ await select({
 		},
 		{
 			name: 'Generating website pages',
-
 			value: 'generate_pages',
 			description: 'Generating website pages',
 		},
@@ -32,29 +32,21 @@ await select({
 			description: 'Setting up site styles',
 		},
 		new Separator(),
+		{
+			name: 'Connect to Google Sheet table',
+			value: 'connect_gsheets',
+		},
 	],
-}).then(async (res) => {
-	switch (res) {
+}).then(async (value) => {
+	switch (value) {
 		case 'generate_project':
-			await select({
-				message: 'Choise a template',
-				choices: [
-					{
-						name: 'Website series / anime',
-						value: 'series-template',
-					},
-				],
-			}).then(async (res) => {
-				const dest_path = await input({
-					message: 'Input destination path: ',
-					default: '.',
-				});
-				const dest = path.resolve(process.cwd(), dest_path);
-				await startTemplateByName(dest, res);
-			});
+			await generate_project();
+			break;
+		case 'connect_gsheets':
+			await gsheets_api();
 			break;
 		default:
 			break;
 	}
-	return res;
+	return value;
 });

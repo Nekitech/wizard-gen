@@ -10,11 +10,5 @@
 		"build": "tsc --noEmit && tsup && node copy-templates.js",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix"
-	},
-	"dependencies": {
-		"fs-extra": "^11.3.0"
-	},
-	"devDependencies": {
-		"@types/fs-extra": "^11.0.4"
 	}
 }
