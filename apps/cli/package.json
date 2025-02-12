@@ -1,18 +1,16 @@
 {
 	"name": "@wizard-gen/cli",
 	"type": "module",
-	"version": "0.0.0",
-	"private": true,
+	"version": "0.0.2",
+	"bin": {
+		"wizard-gen": "bin/index.js"
+	},
 	"scripts": {
 		"dev": "echo 'Add dev script here'",
 		"build": "tsc --noEmit && tsup",
 		"test": "echo 'Add test script here'",
 		"lint:fix": "eslint . --fix",
-		"lint": "eslint .",
-		"install_packets": "pnpm install"
-	},
-	"bin": {
-		"wizard-gen": "bin/index.js"
+		"lint": "eslint ."
 	},
 	"dependencies": {
 		"@inquirer/prompts": "^7.2.4",
