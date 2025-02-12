@@ -6,12 +6,14 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 export class Excel {
 	table: GoogleSpreadsheet | null = null;
 
-	constructor(serviceAccountAuth: JWT) {
+	constructor(serviceAccountAuth: JWT, envPath: string) {
 		try {
 			config({
-				path: path.resolve(process.cwd(), '../.env'),
+				path: path.resolve(process.cwd(), envPath),
 			});
 			this.table = new GoogleSpreadsheet(process.env.GOOGLE_SHEETS_TABLE_ID ?? '', serviceAccountAuth);
+
+			console.warn('Таблица успешно подключена!');
 		} catch (e: any) {
 			throw new Error(e.message);
 		}
@@ -19,6 +21,8 @@ export class Excel {
 
 	async init() {
 		await this.table?.loadInfo();
+
+		console.warn('Информация о таблице успешно загружена!');
 	}
 
 	async getNameSheets() {
