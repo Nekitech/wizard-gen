@@ -1,22 +1,27 @@
 import path from 'node:path';
-import { input, select } from '@inquirer/prompts';
+import { cancel, isCancel, select, text } from '@clack/prompts';
 import { startTemplateByName } from '@wizard-gen/templates';
 
 export async function generate_project() {
 	return await select({
 		message: 'Choise a template',
-		choices: [
+		options: [
 			{
-				name: 'Website series / anime',
+				label: 'Website series / anime',
 				value: 'series-template',
 			},
 		],
 	}).then(async (res) => {
-		const dest_path = await input({
+		const dest_path = await text({
 			message: 'Input destination path: ',
-			default: '.',
+			defaultValue: '.',
 		});
+
+		if (isCancel(dest_path)) {
+			cancel('Operation cancelled.');
+			process.exit(0);
+		}
 		const dest = path.resolve(process.cwd(), dest_path);
-		await startTemplateByName(dest, res);
+		await startTemplateByName(dest, res as string);
 	});
 }
