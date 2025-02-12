@@ -13,9 +13,10 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"@inquirer/prompts": "^7.2.4",
+		"@clack/prompts": "^0.10.0",
 		"@wizard-gen/chatgpt": "workspace:*",
 		"@wizard-gen/gsheets": "workspace:*",
-		"@wizard-gen/templates": "workspace:*"
+		"@wizard-gen/templates": "workspace:*",
+		"picocolors": "^1.1.1"
 	}
 }
