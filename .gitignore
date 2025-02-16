@@ -5,3 +5,4 @@ dist/
 .vscode
 .turbo
 .changeset
+creds.json
