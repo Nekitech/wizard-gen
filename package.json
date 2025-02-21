@@ -1,16 +1,15 @@
 {
 	"name": "wizard-gen",
 	"type": "module",
-	"private": false,
+	"version": "0.0.7",
 	"packageManager": "pnpm@9.5.0",
 	"bin": {
-		"wizard-gen": "dist/index.js"
+		"wizard-gen": "bin/index.js"
 	},
 	"scripts": {
-		"build": "tsup src/index.ts --format esm,cjs",
-		"dev": "turbo run dev",
-		"lint": "turbo run lint",
-		"publish-packages": "turbo run build lint && changeset version && changeset publish"
+		"build": "tsup index.ts --format esm,cjs && node copy-templates.js",
+		"lint": "eslint . --fix",
+		"publish-packages": "npm run build && npm run lint && npm publish"
 	},
 	"dependencies": {
 		"@clack/prompts": "^0.10.0",
@@ -20,7 +19,6 @@
 		"google-spreadsheet": "^4.1.4",
 		"gray-matter": "^4.0.3",
 		"picocolors": "^1.1.1",
-		"turbo": "^2.3.4",
 		"typescript": "^5.7.3"
 	},
 	"devDependencies": {

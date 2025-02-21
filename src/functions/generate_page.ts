@@ -1,16 +1,14 @@
 import * as prompt from '@clack/prompts';
 import { log } from '@clack/prompts';
-import { page_generation } from '../codegen/page';
 import { isEmpty } from '../helpers/validation';
 
 export async function generate_page() {
-	await page_generation('cast');
-	return await prompt.group({
+	await prompt.group({
 		kindPage: () => prompt.text({
-			message: 'What kind of page do you want to create? (description)',
+			message: 'Description page',
 		}),
 		namePage: () => prompt.text({
-			message: 'Name of page',
+			message: 'Type page',
 		}),
 		fieldsPage: () => prompt.text({
 			message: 'List the fields that the entity should be',
@@ -23,10 +21,26 @@ export async function generate_page() {
 				return;
 			},
 		}),
+		typeFields: (result) => {
+			const name_fields = result.results.fieldsPage?.split(',') ?? [];
+			const fieldTypes = ['string', 'number', 'boolean', 'date', 'array', 'object'];
+			const groups = Object.fromEntries(
+				name_fields.map((name: string) => [
+					name,
+					() =>
+						prompt.select({
+							message: `Choose a field type "${name}"`,
+							options: fieldTypes.map(type => ({ value: type, label: type })),
+						}),
+				]),
+			);
+			return prompt.group(groups);
+		},
 	}, {
 		onCancel: () => {
 			prompt.cancel('Operation cancelled.');
 			process.exit(0);
 		},
 	});
+	// вызов питон файла для отправки результатов анкеты
 }

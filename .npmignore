@@ -1,0 +1,5 @@
+node_modules
+creds.json
+.env
+.idea
+src/src/**/*.*

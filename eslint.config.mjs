@@ -48,7 +48,7 @@ export default antfu(
 				],
 			},
 		},
-		ignores: ['**/templates/templates/**'],
+		ignores: ['**/templates/**'],
 	},
 	{
 		files: ['**/*.{ts,js}'],

@@ -5,7 +5,7 @@ import fs from 'fs-extra';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const templatesSrc = path.resolve(__dirname, 'templates');
+const templatesSrc = path.resolve(__dirname, 'src/templates');
 const templatesDest = path.resolve(__dirname, 'dist/templates');
 
 await fs.copy(templatesSrc, templatesDest, (err) => {

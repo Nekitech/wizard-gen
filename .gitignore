@@ -6,3 +6,7 @@ dist/
 .turbo
 .changeset
 creds.json
+
+# папка для тестирования генерации файлов
+src/src/**/*.*
+test/

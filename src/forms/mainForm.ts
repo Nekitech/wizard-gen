@@ -10,6 +10,11 @@ export const mainForm = [
 		hint: 'Generate page',
 	},
 	{
+		value: 'update_page',
+		label: 'Update page',
+		hint: 'Обновить страницу актуальными данными из Google Sheets таблички',
+	},
+	{
 		value: 'generate_comments',
 		label: 'Generating comments',
 		hint: 'Generating comments',
@@ -23,9 +28,5 @@ export const mainForm = [
 		value: 'config_styles',
 		label: 'Setting up site styles',
 		hint: 'Setting up site styles',
-	},
-	{
-		value: 'connect_gsheets',
-		label: 'Connect to Google Sheet table',
 	},
 ];
