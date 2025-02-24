@@ -9,7 +9,7 @@ export class Excel {
 	constructor(envPath: string) {
 		try {
 			config({
-				path: path.resolve(process.cwd(), envPath),
+				path: [path.resolve(process.cwd(), envPath), path.resolve(process.cwd(), `../${envPath}`)],
 			});
 			const serviceAccountAuth = new JWT({
 				email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,

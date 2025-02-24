@@ -1,4 +1,5 @@
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import fs from 'fs-extra';
 
 const templates_folder = 'templates';
@@ -9,7 +10,8 @@ const templates_folder = 'templates';
  * @param name
  */
 export async function startTemplateByName(dest: string, name: string) {
-	const source = path.join(process.cwd(), templates_folder, name);
+	const __dirname = path.dirname(fileURLToPath(import.meta.url));
+	const source = path.join(__dirname, templates_folder, name);
 	if (!fs.existsSync(source)) {
 		throw new Error(`Source directory does not exist: ${source}`);
 	}

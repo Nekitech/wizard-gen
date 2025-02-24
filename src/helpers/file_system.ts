@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import fs from 'fs-extra';
 
 /**
@@ -7,7 +8,9 @@ import fs from 'fs-extra';
  * @returns {string[]} - Массив названий директорий.
  */
 export function getDirectories(dirPath: string): string[] {
-	const templates_path = path.resolve(process.cwd(), dirPath);
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = path.dirname(__filename);
+	const templates_path = path.resolve(__dirname, dirPath);
 	if (!fs.existsSync(templates_path)) {
 		throw new Error(`Директория не существует: ${dirPath}`);
 	}

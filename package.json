@@ -1,7 +1,7 @@
 {
 	"name": "wizard-gen",
 	"type": "module",
-	"version": "0.0.7",
+	"version": "0.0.10",
 	"packageManager": "pnpm@9.5.0",
 	"bin": {
 		"wizard-gen": "bin/index.js"
