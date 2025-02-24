@@ -1,25 +1,31 @@
 {
-	"name": "@wizard-gen/monorepo",
+	"name": "wizard-gen",
 	"type": "module",
-	"private": false,
+	"version": "0.0.10",
 	"packageManager": "pnpm@9.5.0",
+	"bin": {
+		"wizard-gen": "bin/index.js"
+	},
 	"scripts": {
-		"build": "turbo run build",
-		"dev": "turbo run dev",
-		"lint": "turbo run lint",
-		"create-package": "turbo gen workspace --type package",
-		"publish-packages": "turbo run build lint && changeset version && changeset publish"
+		"build": "tsup index.ts --format esm,cjs && node copy-templates.js",
+		"lint": "eslint . --fix",
+		"publish-packages": "npm run build && npm run lint && npm publish"
 	},
 	"dependencies": {
+		"@clack/prompts": "^0.10.0",
 		"dotenv": "^16.4.7",
 		"fs-extra": "^11.3.0",
-		"turbo": "^2.3.4",
+		"google-auth-library": "^9.15.1",
+		"google-spreadsheet": "^4.1.4",
+		"gray-matter": "^4.0.3",
+		"picocolors": "^1.1.1",
 		"typescript": "^5.7.3"
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^4.1.0",
 		"@changesets/cli": "^2.27.12",
 		"@types/fs-extra": "^11.0.4",
+		"@types/node": "^22.12.0",
 		"eslint": "^9.19.0",
 		"tsup": "^8.3.6"
 	}

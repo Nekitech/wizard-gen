@@ -48,11 +48,12 @@ export default antfu(
 				],
 			},
 		},
-		ignores: ['**/templates/templates/**'],
+		ignores: ['**/templates/**'],
 	},
 	{
 		files: ['**/*.{ts,js}'],
 		rules: {
+			'no-useless-return': 'off',
 			'no-console': 'off',
 			'antfu/no-top-level-await': 'off',
 			'eslint-comments/no-unlimited-disable': 'off',

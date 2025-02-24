@@ -5,3 +5,9 @@ dist/
 .vscode
 .turbo
 .changeset
+creds.json
+
+# папка для тестирования генерации файлов
+src/src/**/*.*
+test/
+venv
