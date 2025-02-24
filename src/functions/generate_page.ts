@@ -1,3 +1,5 @@
+import { spawn } from 'node:child_process';
+import * as process from 'node:process';
 import * as prompt from '@clack/prompts';
 import { log } from '@clack/prompts';
 import { isEmpty } from '../helpers/validation';
@@ -70,6 +72,16 @@ async function getNestedFieldTypes(fieldNames: string[], depth: number): Promise
 	return result;
 }
 
+async function call_python(args) {
+	const py_proc = spawn('python', ['../../content_generator/main_gen.py'], {
+		env: process.env,
+	});
+
+	py_proc.stdout.on('data', (data) => {
+		console.log(data.toString());
+	});
+}
+
 export async function generate_page() {
 	const result = await prompt.group({
 		kindPage: () =>
@@ -102,7 +114,6 @@ export async function generate_page() {
 			process.exit(0);
 		},
 	});
-
 	console.log('Результат:', JSON.stringify(result, null, 2));
 	// Вызов Python-файла для отправки результатов анкеты
 }
