@@ -53,6 +53,7 @@ export default antfu(
 	{
 		files: ['**/*.{ts,js}'],
 		rules: {
+			'prefer-promise-reject-errors': 'off',
 			'no-useless-return': 'off',
 			'no-console': 'off',
 			'antfu/no-top-level-await': 'off',
