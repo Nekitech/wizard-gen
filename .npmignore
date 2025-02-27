@@ -3,4 +3,4 @@ creds.json
 .env
 .idea
 src/src/**/*.*\
-venv
+coontent_generator/venv

@@ -8,6 +8,6 @@ dist/
 creds.json
 
 # папка для тестирования генерации файлов
-src/src/**/*.*
+src/content/**/*.*
 test/
-venv
+content_generator/venv

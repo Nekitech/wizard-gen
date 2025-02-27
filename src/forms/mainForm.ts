@@ -5,14 +5,19 @@ export const mainForm = [
 		hint: 'Generation of the site on the template',
 	},
 	{
-		value: 'generate_page',
-		label: 'Generate page',
-		hint: 'Generate page',
+		value: 'generate_collection',
+		label: 'Generate collection',
+		hint: 'Generate collection of page',
+	},
+	{
+		value: 'fill_google_sheet_table',
+		label: 'Fill Google Sheet table',
+		hint: 'Fill Google Sheet table',
 	},
 	{
 		value: 'update_page',
 		label: 'Update page',
-		hint: 'Обновить страницу актуальными данными из Google Sheets таблички',
+		hint: 'Обновить md файл страницы актуальными данными из Google Sheets листа',
 	},
 	{
 		value: 'generate_comments',
