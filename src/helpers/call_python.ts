@@ -1,16 +1,39 @@
+import path from 'node:path';
+import * as process from 'node:process';
+import { fileURLToPath } from 'node:url';
 import { log } from '@clack/prompts';
 import * as ncp from 'node-calls-python';
 
-const PYTHON_BIN_PATH = 'content_generator/venv/bin/python';
-const PYTHON_PATH_PACKAGES = 'content_generator/venv/lib/python3.12/site-packages';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function getPythonBinPath(): string {
+	const venvDir = path.join(__dirname, '..', '..', 'content_generator', 'venv');
+	return process.platform === 'win32'
+		? path.join(venvDir, 'Scripts', 'python.exe') // Windows
+		: path.join(venvDir, 'bin', 'python'); // Unix (Linux/macOS)
+}
+
+function getPythonPackagesPath(): string {
+	const venvDir = path.join(__dirname, '..', '..', 'content_generator', 'venv');
+	return process.platform === 'win32'
+		? path.join(venvDir, 'Lib', 'site-packages') // Windows
+		: path.join(venvDir, 'lib', `python3.13`, 'site-packages'); // Unix (Linux/macOS)
+}
 
 export async function call_python(path_python_file: string, name_function: string, ...args: any[]) {
 	return new Promise((resolve, reject) => {
 		const py = ncp.interpreter;
-		py.setPythonExecutable(PYTHON_BIN_PATH);
-		py.addImportPath(PYTHON_PATH_PACKAGES);
 
-		py.import(path_python_file, false)
+		const absolute_path_python_file = path.join(__dirname, '..', '..', 'content_generator', path_python_file);
+
+		const pythonBinPath = getPythonBinPath();
+		py.setPythonExecutable(pythonBinPath);
+		const pythonPackagesPath = getPythonPackagesPath();
+		py.addImportPath(pythonPackagesPath);
+
+		console.log(pythonPackagesPath);
+
+		py.import(absolute_path_python_file, false)
 			.then((pymodule) => {
 				py.call(pymodule, name_function, ...args)
 					.then(res => resolve(res))

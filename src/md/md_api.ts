@@ -11,26 +11,17 @@ import { connectGoogleApiTable } from '../gsheets/connect';
  * @returns Преобразованное значение.
  */
 function transformValue(value: any, type: string): any {
-	console.log(value, type);
 	switch (type) {
 		case 'number':
 			return Number(value);
 		case 'boolean':
 			return value === 'true' || value === '1' || value === true;
 		case 'object':
-			try {
-				return JSON.parse(value); // Парсим JSON, если это объект
-			} catch (e) {
-				return {}; // Возвращаем пустой объект в случае ошибки
-			}
+			return JSON.parse(value);
 		case 'array':
-			try {
-				return JSON.parse(value); // Парсим JSON, если это массив
-			} catch (e) {
-				return []; // Возвращаем пустой массив в случае ошибки
-			}
+			return JSON.parse(value);
 		default:
-			return value; // Для строк и других типов возвращаем как есть
+			return value;
 	}
 }
 

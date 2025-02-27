@@ -1,4 +1,3 @@
-
 ---
 
 ### Шаг 1: Перейдите в [Google Cloud Console](https://console.cloud.google.com/)

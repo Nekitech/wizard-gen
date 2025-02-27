@@ -7,10 +7,8 @@ import time
 from helpers import result_to_json
 from llm_module import send_to_gemini
 
-# project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# sys.path.append(project_root)
 
-load_dotenv('content_generator/.env')
+load_dotenv('.env')
 
 
 def dict_to_row(data_dict, headers):

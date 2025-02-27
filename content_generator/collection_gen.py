@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from helpers import result_to_json
 from llm_module import send_to_gemini
 
-load_dotenv('content_generator/.env')
+load_dotenv('.env')
 example_collection = """
         const castAnimeCollection = defineCollection({
           type: "content",

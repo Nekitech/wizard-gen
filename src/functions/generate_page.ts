@@ -7,7 +7,6 @@ import { call_python } from '../helpers/call_python';
 import { isEmpty } from '../helpers/validation';
 
 const MAX_DEPTH = 3; // Максимальная глубина вложенности объектов
-const PYTHON_BIN_PATH = 'content_generator/venv/bin/python';
 /**
  * Рекурсивная функция для получения типов полей объекта
  * @param fieldName - Имя поля
@@ -142,7 +141,7 @@ export async function generate_collection() {
 		});
 		const s = spinner();
 		s.start('Обработка запроса Gemini');
-		const result_call = await call_python('content_generator/collection_gen.py', 'generate_collection', JSON.stringify(result)) as string;
+		const result_call = await call_python('collection_gen.py', 'generate_collection', JSON.stringify(result)) as string;
 		const code_collection = JSON.parse(result_call)?.collection ?? '';
 		write_to_config(result.typePage, code_collection);
 		s.stop('Gemini завершил обработку, коллекция записана в config.ts');
