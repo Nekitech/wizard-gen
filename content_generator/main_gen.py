@@ -133,7 +133,7 @@ def main():
             else:
                 print('error :(')
             time.sleep(15)
-            return response_gemini
+            # return response_gemini
 
             # TODO: Обработка ответа LLM и формирование словаря result
             # result = process_llm_response(response)  # Ваша функция обработки ответа
