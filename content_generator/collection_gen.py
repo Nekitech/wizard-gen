@@ -1,6 +1,5 @@
 import os
 import json
-import sys
 from dotenv import load_dotenv
 
 from helpers import result_to_json
@@ -56,5 +55,4 @@ def generate_collection(params):
         в соотв. названую переменную - collection: const {data['typePage']}Collection = defineCollection(...)
     """
     result = send_to_gemini(template, google_api_key)
-    print(json.dumps(result_to_json(result)))
     return json.dumps(result_to_json(result))

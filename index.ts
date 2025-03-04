@@ -2,6 +2,7 @@ import * as prompt from '@clack/prompts';
 import color from 'picocolors';
 import { mainForm } from './src/forms/mainForm';
 import { fillGoogleSheetTable } from './src/functions/fill_google_sheet_table';
+import { generate_comments } from './src/functions/generate_comments';
 import { generate_collection } from './src/functions/generate_page';
 import { generate_project } from './src/functions/generate_project';
 import { update_page } from './src/functions/update_page';
@@ -32,6 +33,9 @@ async function main() {
 					break;
 				case 'fill_google_sheet_table':
 					await fillGoogleSheetTable();
+					break;
+				case 'generate_comments':
+					await generate_comments();
 					break;
 				default:
 					break;

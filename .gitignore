@@ -11,3 +11,4 @@ creds.json
 src/content/**/*.*
 test/
 content_generator/venv
+content_generator/__pycache__
