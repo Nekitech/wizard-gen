@@ -1,10 +1,15 @@
 import os
 import json
 import sys
+
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
+
+from content_generator.helpers import result_to_json
+from content_generator.llm_module import send_to_gemini
+
 from dotenv import load_dotenv
 
-from helpers import result_to_json
-from llm_module import send_to_gemini
 
 load_dotenv('.env')
 example_collection = """
@@ -56,5 +61,5 @@ def generate_collection(params):
         в соотв. названую переменную - collection: const {data['typePage']}Collection = defineCollection(...)
     """
     result = send_to_gemini(template, google_api_key)
-    print(json.dumps(result_to_json(result)))
+    # print(json.dumps(result_to_json(result)))
     return json.dumps(result_to_json(result))

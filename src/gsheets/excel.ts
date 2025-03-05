@@ -12,8 +12,8 @@ export class Excel {
 				path: [path.resolve(process.cwd(), envPath), path.resolve(process.cwd(), `../${envPath}`)],
 			});
 			const serviceAccountAuth = new JWT({
-				email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
-				key: process.env.GOOGLE_SHEETS_PRIVATE_KEY,
+				email: process.env.CREDENTIALS_CLIENT_EMAIL,
+				key: process.env.CREDENTIALS_PRIVATE_KEY,
 				scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 			});
 			this.table = new GoogleSpreadsheet(process.env.GOOGLE_SHEETS_TABLE_ID ?? '', serviceAccountAuth);
