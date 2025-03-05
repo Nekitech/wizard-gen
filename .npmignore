@@ -4,3 +4,4 @@ creds.json
 .idea
 src/src/**/*.*\
 coontent_generator/venv
+credentials.json
