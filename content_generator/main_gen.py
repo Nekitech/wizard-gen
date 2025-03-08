@@ -84,6 +84,34 @@ def main():
     for i in range(3, len(spreadsheet.worksheets())):  # Начинаем с четвёртого листа
         worksheet = spreadsheet.get_worksheet(i)
         worksheet_title = worksheet.title
+        data = worksheet.get_all_records()
+        headers = worksheet.row_values(1)
+        if worksheet_title == "page_index":
+            desc = {"description":"Описание главной страницы", "h1":"Заголовок на странице", "title":"Загловок файла", "text":"Текст страницы с описанием тайтла", "url":"url"}
+            template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о сериале. 
+                Cемантическое ядро: {semantic_core}
+                Описание страницы: это главная страница сайта
+                Нужно сгенерировать поля: {desc}
+                Ответ на запрос верни в формате json. 
+"""
+            response_gemini = send_to_gemini(template, google_api_key)
+            # response_gemini = {'releaseDate': '2015-10-05', 'rating': '16+', 'description': 'Сайтама – обычный парень, который, чтобы стать супергероем, тренировался три года. Теперь он настолько силен, что побеждает любого противника с одного удара. Однако, его абсолютная мощь сделала его жизнь скучной и неинтересной. В этом эпизоде Сайтама сталкивается с многочисленными злодеями, но ни один из них не представляет для него серьезной угрозы. Он пытается найти достойного соперника и смысл в своей героической деятельности. Встречает Геноса, киборга жаждущего мести.', 'duration': '24', 'h1': 'Ванпанчмен 1 сезон 1 серия: Сильнейший человек - Смотреть онлайн бесплатно', 'id': 'onepunchman-s1-e1', 'season': '1', 'videoUrl': 'https://example.com/onepunchman-s1-e1.mp4', 'slug': '/watch/onepunchman/season-1/episode-1', 'thumbnail': '/images/onepunchman/s1/ep1.jpg', 'title': 'Ванпанчмен 1 сезон 1 серия: Сильнейший человек смотреть онлайн бесплатно на русском', 'keywords': 'Ванпанчмен 1 сезон Сильнейший человек смотреть на русском, аниме смотреть онлайн бесплатно, one punch man', 'seiyuu': [{'name': 'Макото Фурукава', 'character': 'Сайтама'}, {'name': 'Кайто Исикава', 'character': 'Генос'}], 'studio': 'Madhouse'}
+            if response_gemini:
+                response_gemini = result_to_json(response_gemini)
+                print("Ответ:")
+                print(response_gemini)
+                row_data = dict_to_row(response_gemini, headers)
+                for col_index in range(len(headers)):
+                    if row_data[col_index] and headers[col_index] != "slug":
+                        try:
+                            worksheet.update_cell(2, col_index + 1, row_data[col_index])
+                        except Exception as e:
+                            print(f"Ошибка при работе с Google Sheets: {e}")
+                #     pass
+            else:
+                print('error :(')
+            time.sleep(5)
+            continue
         worksheet_title = worksheet_title[5:]
         worksheet_title = worksheet_title.lstrip("_")
         if worksheet_title not in page_types:
@@ -96,8 +124,6 @@ def main():
             continue
 
         # Получаем данные со второго и третьего столбца (slug и keywords)
-        data = worksheet.get_all_records()
-        headers = worksheet.row_values(1)
         for index, row in enumerate(data):
             slug = row.get('slug', '')
             keywords = row.get('keywords', '')
@@ -132,7 +158,7 @@ def main():
                 #     pass
             else:
                 print('error :(')
-            time.sleep(15)
+            time.sleep(5)
             # return response_gemini
 
             # TODO: Обработка ответа LLM и формирование словаря result

@@ -74,14 +74,14 @@ def main():
         # Получаем данные со столбца slug
         data = worksheet.get_all_records()
         headers = worksheet.row_values(1)
-        json_template = "{\"text\": \"\", \"name\": \"\"}"
+        json_template = "{\"text\": [\"comment1\", \"comment2\", ...]\", \"name\": [\"name1\", \"name2\", ...]}"
         for index, row in enumerate(data):
             slug = row.get('slug', '')
             if not slug:
                 print(f"Пропускаю строку {index + 1}: отсутствуют slug или keywords.")
                 continue
 
-            template = f"""Сгенерируй один коментарий на основе семантического ядра и твоих знаний. 
+            template = f"""Сгенерируй коментарии на основе семантического ядра и твоих знаний. 
                 Cемантическое ядро: {semantic_core}
                 Для страницы: {slug}
                 Нужно сгенерировать поля: text - текст коментария, name - имя пользователя (может быть как имя, так и ник или аноним)
@@ -112,5 +112,3 @@ def main():
         print(f"Лист '{worksheet_title}' успешно обработан.")
 
     print("Все листы обработаны.")
-
-# main()
