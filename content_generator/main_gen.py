@@ -44,20 +44,20 @@ def main():
         exit(1)
 
     # Шаг 1: Сбор семантического ядра (первый лист)
-    semantic_core_worksheet = spreadsheet.get_worksheet(0)  # Первый лист
-    semantic_core_data = semantic_core_worksheet.col_values(1)  # Первая колонка
+    semantic_core_worksheet = spreadsheet.get_worksheet(0) 
+    semantic_core_data = semantic_core_worksheet.col_values(1) 
     semantic_core = [item.strip() for item in semantic_core_data if item.strip()]
     semantic_core = semantic_core[1:]
     print(f"Семантическое ядро собрано: {len(semantic_core)} элементов.")
 
     # Шаг 2: Сбор типов страниц и их описаний (второй лист)
-    page_types_worksheet = spreadsheet.get_worksheet(1)  # Второй лист
+    page_types_worksheet = spreadsheet.get_worksheet(1) 
     page_types_data = page_types_worksheet.get_all_records()
     page_types = {row['type']: row['description'] for row in page_types_data}
     print(f"Типы страниц собраны: {len(page_types)} типов.")
 
     # Шаг 3: Сбор ключей и их описаний для каждого типа (третий лист)
-    descriptions_worksheet = spreadsheet.get_worksheet(2)  # Третий лист
+    descriptions_worksheet = spreadsheet.get_worksheet(2)  
     descriptions_data = descriptions_worksheet.get_all_records()
     descriptions = {}
     for row in descriptions_data:
@@ -84,7 +84,7 @@ def main():
                 Ответ на запрос верни в формате json. 
 """
             response_gemini = send_to_gemini(template, google_api_key)
-            # response_gemini = {'releaseDate': '2015-10-05', 'rating': '16+', 'description': 'Сайтама – обычный парень, который, чтобы стать супергероем, тренировался три года. Теперь он настолько силен, что побеждает любого противника с одного удара. Однако, его абсолютная мощь сделала его жизнь скучной и неинтересной. В этом эпизоде Сайтама сталкивается с многочисленными злодеями, но ни один из них не представляет для него серьезной угрозы. Он пытается найти достойного соперника и смысл в своей героической деятельности. Встречает Геноса, киборга жаждущего мести.', 'duration': '24', 'h1': 'Ванпанчмен 1 сезон 1 серия: Сильнейший человек - Смотреть онлайн бесплатно', 'id': 'onepunchman-s1-e1', 'season': '1', 'videoUrl': 'https://example.com/onepunchman-s1-e1.mp4', 'slug': '/watch/onepunchman/season-1/episode-1', 'thumbnail': '/images/onepunchman/s1/ep1.jpg', 'title': 'Ванпанчмен 1 сезон 1 серия: Сильнейший человек смотреть онлайн бесплатно на русском', 'keywords': 'Ванпанчмен 1 сезон Сильнейший человек смотреть на русском, аниме смотреть онлайн бесплатно, one punch man', 'seiyuu': [{'name': 'Макото Фурукава', 'character': 'Сайтама'}, {'name': 'Кайто Исикава', 'character': 'Генос'}], 'studio': 'Madhouse'}
+            
             if response_gemini:
                 response_gemini = result_to_json(response_gemini)
                 print("Ответ:")
@@ -96,7 +96,6 @@ def main():
                             worksheet.update_cell(2, col_index + 1, row_data[col_index])
                         except Exception as e:
                             print(f"Ошибка при работе с Google Sheets: {e}")
-                #     pass
             else:
                 print('error :(')
             time.sleep(5)
@@ -117,6 +116,7 @@ def main():
             slug = row.get('slug', '')
             # keywords = row.get('keywords', '')
             # Ключевые слова: {keywords}
+
             # if not slug or not keywords:
             #     print(f"Пропускаю строку {index + 1}: отсутствуют slug или keywords.")
             #     continue
@@ -128,15 +128,12 @@ def main():
                 Нужно сгенерировать поля: {descriptions.get(worksheet_title, {})}
                 Ответ на запрос верни в формате json. """
 
-            # print(f"Запрос для LLM (строка {index + 1}):\n{template}")
 
             # Отправка запроса в Gemini
             response_gemini = send_to_gemini(template, google_api_key)
-            # response_gemini = {'releaseDate': '2015-10-05', 'rating': '16+', 'description': 'Сайтама – обычный парень, который, чтобы стать супергероем, тренировался три года. Теперь он настолько силен, что побеждает любого противника с одного удара. Однако, его абсолютная мощь сделала его жизнь скучной и неинтересной. В этом эпизоде Сайтама сталкивается с многочисленными злодеями, но ни один из них не представляет для него серьезной угрозы. Он пытается найти достойного соперника и смысл в своей героической деятельности. Встречает Геноса, киборга жаждущего мести.', 'duration': '24', 'h1': 'Ванпанчмен 1 сезон 1 серия: Сильнейший человек - Смотреть онлайн бесплатно', 'id': 'onepunchman-s1-e1', 'season': '1', 'videoUrl': 'https://example.com/onepunchman-s1-e1.mp4', 'slug': '/watch/onepunchman/season-1/episode-1', 'thumbnail': '/images/onepunchman/s1/ep1.jpg', 'title': 'Ванпанчмен 1 сезон 1 серия: Сильнейший человек смотреть онлайн бесплатно на русском', 'keywords': 'Ванпанчмен 1 сезон Сильнейший человек смотреть на русском, аниме смотреть онлайн бесплатно, one punch man', 'seiyuu': [{'name': 'Макото Фурукава', 'character': 'Сайтама'}, {'name': 'Кайто Исикава', 'character': 'Генос'}], 'studio': 'Madhouse'}
+            
             if response_gemini:
                 response_gemini = result_to_json(response_gemini)
-                # print("Ответ:")
-                # print(response_gemini)
                 row_data = dict_to_row(response_gemini, headers)
                 for col_index in range(len(headers)):
                     if row_data[col_index] and headers[col_index] != "slug":
@@ -144,17 +141,9 @@ def main():
                             worksheet.update_cell(index + 2, col_index + 1, row_data[col_index])
                         except Exception as e:
                             print(f"Ошибка при работе с Google Sheets: {e}")
-                #     pass
             else:
                 print('error :(')
             time.sleep(5)
-            # return response_gemini
-
-            # TODO: Обработка ответа LLM и формирование словаря result
-            # result = process_llm_response(response)  # Ваша функция обработки ответа
-
-            # Обновление строки в таблице
-            # worksheet.update_cell(index + 2, column_index, value)  # column_index и value зависят от result
 
         print(f"Лист '{worksheet_title}' успешно обработан.")
 
