@@ -126,16 +126,16 @@ def main():
         # Получаем данные со второго и третьего столбца (slug и keywords)
         for index, row in enumerate(data):
             slug = row.get('slug', '')
-            keywords = row.get('keywords', '')
-            if not slug or not keywords:
-                print(f"Пропускаю строку {index + 1}: отсутствуют slug или keywords.")
-                continue
+            # keywords = row.get('keywords', '')
+            # Ключевые слова: {keywords}
+            # if not slug or not keywords:
+            #     print(f"Пропускаю строку {index + 1}: отсутствуют slug или keywords.")
+            #     continue
 
             template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о сериале. 
                 Cемантическое ядро: {semantic_core}
                 Описание страницы: {page_types.get(worksheet_title, '')}
                 Для страницы: {slug}
-                Ключевые слова: {keywords}
                 Нужно сгенерировать поля: {descriptions.get(worksheet_title, {})}
                 Ответ на запрос верни в формате json. """
 
@@ -170,3 +170,5 @@ def main():
         print(f"Лист '{worksheet_title}' успешно обработан.")
 
     print("Все листы обработаны.")
+
+# main()
