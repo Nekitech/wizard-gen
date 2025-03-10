@@ -87,7 +87,10 @@ function write_to_config(collectionName: string, collectionCode: string): void {
 		if (fs.existsSync(configPath)) {
 			configContent = fs.readFileSync(configPath, 'utf-8');
 		} else {
-			configContent = `import { defineCollection, z } from 'astro:content';\n\n`;
+			const defaultContent = `import { defineCollection, z } from 'astro:content';\n\n`;
+			fs.mkdirSync(path.dirname(configPath), { recursive: true }); // Создаем директорию, если её нет
+			fs.writeFileSync(configPath, defaultContent, 'utf-8'); // Создаем файл
+			configContent = defaultContent; // Устанавливаем содержимое
 		}
 
 		configContent += `\n${collectionCode}\n`;
