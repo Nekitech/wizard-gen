@@ -82,24 +82,33 @@ function write_to_config(collectionName: string, collectionCode: string): void {
 	const configPath = path.resolve(process.cwd(), 'src/content/config.ts');
 
 	try {
-		let configContent = fs.existsSync(configPath)
-			? fs.readFileSync(configPath, 'utf-8')
-			: `import { defineCollection, z } from 'astro:content';\n\n`;
+		let configContent = '';
+
+		if (fs.existsSync(configPath)) {
+			configContent = fs.readFileSync(configPath, 'utf-8');
+		} else {
+			configContent = `import { defineCollection, z } from 'astro:content';\n\n`;
+		}
 
 		configContent += `\n${collectionCode}\n`;
 
+		// regexp для поиска export const collections
 		const exportRegex = /export\s+const\s+collections\s*=\s*\{([\s\S]*?)\};/;
 		const exportMatch = configContent.match(exportRegex);
 
 		if (exportMatch) {
+			// если export const collections уже существует, обновляем его
 			const existingExports = exportMatch[1].trim();
 			const newExport = `  ${collectionName}: ${collectionName}Collection,`;
 			const updatedExports = `export const collections = {\n${existingExports}\n${newExport}\n};`;
 
-			configContent = configContent.replace(exportRegex, updatedExports);
+			// удаляем старый export и добавляем новый в конец файла
+			configContent = configContent.replace(exportRegex, '').trim();
+			configContent += `\n\n${updatedExports}`;
 		} else {
+			// если export const collections отсутствует, создаем его. Срабатывает при создании первой коллекции
 			const newExport = `export const collections = {\n  ${collectionName}: ${collectionName}Collection,\n};`;
-			configContent += `\n${newExport}\n`;
+			configContent += `\n\n${newExport}`;
 		}
 
 		fs.writeFileSync(configPath, configContent, 'utf-8');
