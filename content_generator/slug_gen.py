@@ -130,6 +130,7 @@ def main():
     #Заполнение страницы комментариев
     worksheet = spreadsheet.get_worksheet(comms_index)
     col_index = 0
+    headers = worksheet.row_values(1)
     for index in range(len(headers)):
         if headers[index] == "slug":
             col_index = index
