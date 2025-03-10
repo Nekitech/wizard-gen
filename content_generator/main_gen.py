@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
 import time
 
-from content_generator.helpers import load_credentials
-from helpers import result_to_json
+from content_generator.helpers import load_credentials, result_to_json
+# from helpers import result_to_json
 from llm_module import send_to_gemini
 
 

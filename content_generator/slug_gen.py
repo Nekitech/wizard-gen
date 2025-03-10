@@ -3,7 +3,7 @@ import gspread
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
 import time
-from content_generator.helpers import load_credentials_from_env
+from content_generator.helpers import load_credentials_from_env, result_to_json
 
 from llm_module import send_to_gemini
 
