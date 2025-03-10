@@ -3,8 +3,8 @@ import gspread
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
 import time
+from content_generator.helpers import load_credentials_from_env
 
-from helpers import result_to_json
 from llm_module import send_to_gemini
 
 
@@ -14,20 +14,6 @@ load_dotenv('.env')
 def dict_to_row(data_dict, headers):
     return [str(data_dict.get(header, '')) for header in headers]
 
-def load_credentials_from_env():
-    cred = dict()
-    cred["type"]=os.getenv("CREDENTIALS_TYPE")
-    cred["project_id"]=os.getenv("CREDENTIALS_PROJECT_ID")
-    cred["private_key_id"]=os.getenv("CREDENTIALS_PRIVATE_KEY_ID")
-    cred["private_key"]=os.getenv("CREDENTIALS_PRIVATE_KEY")
-    cred["client_email"]=os.getenv("CREDENTIALS_CLIENT_EMAIL")
-    cred["client_id"]=os.getenv("CREDENTIALS_CLIENT_ID")
-    cred["auth_uri"]= os.getenv("CREDENTIALS_AUTH_URI")
-    cred["token_uri"]=os.getenv("CREDENTIALS_TOKEN_URI")
-    cred["auth_provider_x509_cert_url"]=os.getenv("CREDENTIALS_AUTH_PROVIDER_X509_CERT_URL")
-    cred["client_x509_cert_url"]=os.getenv("CREDENTIALS_CLIENT_X509_CERT_URL")
-    cred["universe_domain"]=os.getenv("CREDENTIALS_UNIVERSE_DOMAIN")
-    return cred
 
 def main():
     google_sheet_url = os.getenv("GOOGLE_SHEET_URL")
