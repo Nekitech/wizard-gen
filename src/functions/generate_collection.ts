@@ -3,7 +3,7 @@ import * as process from 'node:process';
 import * as prompt from '@clack/prompts';
 import { log, spinner } from '@clack/prompts';
 import fs from 'fs-extra';
-import { call_python } from '../helpers/call_python';
+import { call_python_with_spinner } from '../helpers/call_python';
 import { isEmpty } from '../helpers/validation';
 
 const MAX_DEPTH = 3; // Максимальная глубина вложенности объектов
@@ -141,7 +141,7 @@ export async function generate_collection() {
 		});
 		const s = spinner();
 		s.start('Обработка запроса Gemini');
-		const result_call = await call_python('collection_gen.py', 'generate_collection', JSON.stringify(result)) as string;
+		const result_call = await call_python_with_spinner('collection_gen.py', 'generate_collection', JSON.stringify(result)) as string;
 		const code_collection = JSON.parse(result_call)?.collection ?? '';
 		write_to_config(result.typePage, code_collection);
 		s.stop('Gemini завершил обработку, коллекция записана в config.ts');

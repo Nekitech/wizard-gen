@@ -1,38 +1,27 @@
 import os
+import sys
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
+
 import gspread
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
 import time
 
+from content_generator.helpers import load_credentials
 from helpers import result_to_json
 from llm_module import send_to_gemini
 
 
 load_dotenv('.env')
 
-
 def dict_to_row(data_dict, headers):
     return [str(data_dict.get(header, '')) for header in headers]
-
-def load_credentials_from_env():
-    cred = dict()
-    cred["type"]=os.getenv("CREDENTIALS_TYPE")
-    cred["project_id"]=os.getenv("CREDENTIALS_PROJECT_ID")
-    cred["private_key_id"]=os.getenv("CREDENTIALS_PRIVATE_KEY_ID")
-    cred["private_key"]=os.getenv("CREDENTIALS_PRIVATE_KEY")
-    cred["client_email"]=os.getenv("CREDENTIALS_CLIENT_EMAIL")
-    cred["client_id"]=os.getenv("CREDENTIALS_CLIENT_ID")
-    cred["auth_uri"]= os.getenv("CREDENTIALS_AUTH_URI")
-    cred["token_uri"]=os.getenv("CREDENTIALS_TOKEN_URI")
-    cred["auth_provider_x509_cert_url"]=os.getenv("CREDENTIALS_AUTH_PROVIDER_X509_CERT_URL")
-    cred["client_x509_cert_url"]=os.getenv("CREDENTIALS_CLIENT_X509_CERT_URL")
-    cred["universe_domain"]=os.getenv("CREDENTIALS_UNIVERSE_DOMAIN")
-    return cred
 
 def main():
     google_sheet_url = os.getenv("GOOGLE_SHEET_URL")
     google_api_key = os.getenv("GEMINIAPI")
-    google_credentials = load_credentials_from_env()
+    google_credentials = load_credentials()
 
     if not google_sheet_url:
         raise ValueError("URL Google Sheets не найден в .env файле")
@@ -146,8 +135,8 @@ def main():
             # response_gemini = {'releaseDate': '2015-10-05', 'rating': '16+', 'description': 'Сайтама – обычный парень, который, чтобы стать супергероем, тренировался три года. Теперь он настолько силен, что побеждает любого противника с одного удара. Однако, его абсолютная мощь сделала его жизнь скучной и неинтересной. В этом эпизоде Сайтама сталкивается с многочисленными злодеями, но ни один из них не представляет для него серьезной угрозы. Он пытается найти достойного соперника и смысл в своей героической деятельности. Встречает Геноса, киборга жаждущего мести.', 'duration': '24', 'h1': 'Ванпанчмен 1 сезон 1 серия: Сильнейший человек - Смотреть онлайн бесплатно', 'id': 'onepunchman-s1-e1', 'season': '1', 'videoUrl': 'https://example.com/onepunchman-s1-e1.mp4', 'slug': '/watch/onepunchman/season-1/episode-1', 'thumbnail': '/images/onepunchman/s1/ep1.jpg', 'title': 'Ванпанчмен 1 сезон 1 серия: Сильнейший человек смотреть онлайн бесплатно на русском', 'keywords': 'Ванпанчмен 1 сезон Сильнейший человек смотреть на русском, аниме смотреть онлайн бесплатно, one punch man', 'seiyuu': [{'name': 'Макото Фурукава', 'character': 'Сайтама'}, {'name': 'Кайто Исикава', 'character': 'Генос'}], 'studio': 'Madhouse'}
             if response_gemini:
                 response_gemini = result_to_json(response_gemini)
-                print("Ответ:")
-                print(response_gemini)
+                # print("Ответ:")
+                # print(response_gemini)
                 row_data = dict_to_row(response_gemini, headers)
                 for col_index in range(len(headers)):
                     if row_data[col_index] and headers[col_index] != "slug":
