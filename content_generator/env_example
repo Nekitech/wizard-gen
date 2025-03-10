@@ -1,6 +1,9 @@
 GOOGLE_SHEET_URL=#ссылка на таблицу (без /share )
 GEMINIAPI=#api-ключ (пока гемини, позже в зависимости от модели)
 
+#Название тайтла
+TYTLE=
+
 #Структура полностью копирует структуру credentials.json, значения переносить из него
 CREDENTIALS_TYPE=
 CREDENTIALS_PROJECT_ID=
