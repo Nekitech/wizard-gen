@@ -23,7 +23,7 @@ export async function update_page() {
 			options: type_pages_options,
 		});
 		s.start('Получение данных, загрузка в md-файл');
-		const data = await gsh.getRowsBySheetName(`pages_${selected_type}`);
+		const data = await gsh.getRowsBySheetName(`pages_${selected_type}`, 1);
 		await page_generation(selected_type, data);
 		s.stop('Загрузка завершена');
 	} catch (e) {
