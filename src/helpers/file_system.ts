@@ -42,3 +42,13 @@ export function writeToFile(filePath: string, content: string, options: fs.Write
 		console.error(`Ошибка при записи файла: ${error.message}`);
 	}
 }
+
+export function readJsonFileSync(filePath: string) {
+	try {
+		const fullPath = path.resolve(process.cwd(), filePath);
+		const fileContent = fs.readFileSync(fullPath, 'utf-8');
+		return JSON.parse(fileContent);
+	} catch (error) {
+		throw new Error(`Ошибка при чтении JSON-файла: ${error?.message}`);
+	}
+}

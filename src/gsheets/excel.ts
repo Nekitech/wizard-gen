@@ -2,18 +2,20 @@ import path from 'node:path';
 import { config } from 'dotenv';
 import { JWT } from 'google-auth-library';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
+import { readJsonFileSync } from '../helpers/file_system';
 
 export class Excel {
 	table: GoogleSpreadsheet | null = null;
 
 	constructor(envPath: string) {
 		try {
+			const creds = readJsonFileSync('credentials.json');
 			config({
 				path: [path.resolve(process.cwd(), envPath), path.resolve(process.cwd(), `../${envPath}`)],
 			});
 			const serviceAccountAuth = new JWT({
-				email: process.env.CREDENTIALS_CLIENT_EMAIL,
-				key: process.env.CREDENTIALS_PRIVATE_KEY,
+				email: creds?.client_email,
+				key: creds?.private_key,
 				scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 			});
 			this.table = new GoogleSpreadsheet(process.env.GOOGLE_SHEETS_TABLE_ID ?? '', serviceAccountAuth);
