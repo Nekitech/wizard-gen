@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { log } from '@clack/prompts';
 import fs from 'fs-extra';
 
 /**
@@ -37,9 +38,9 @@ export function writeToFile(filePath: string, content: string, options: fs.Write
 		}
 
 		fs.writeFileSync(filePath, content, options);
-		console.log(`Файл успешно записан: ${filePath}`);
+		log.success(`Файл успешно записан: ${filePath}`);
 	} catch (error) {
-		console.error(`Ошибка при записи файла: ${error.message}`);
+		log.error(`Ошибка при записи файла: ${error?.message}`);
 	}
 }
 
@@ -50,5 +51,46 @@ export function readJsonFileSync(filePath: string) {
 		return JSON.parse(fileContent);
 	} catch (error) {
 		throw new Error(`Ошибка при чтении JSON-файла: ${error?.message}`);
+	}
+}
+
+export function readFile(filePath: string) {
+	try {
+		const fullPath = path.resolve(process.cwd(), filePath);
+		return fs.readFileSync(fullPath, 'utf-8');
+	} catch (error) {
+		throw new Error(`Ошибка при чтении файла: ${error?.message}`);
+	}
+}
+
+export function clearFolder(folderPath: string) {
+	try {
+		if (!fs.existsSync(folderPath)) {
+			log.warn(`Папка ${folderPath} не существует.`);
+			return;
+		}
+
+		const items = fs.readdirSync(folderPath);
+
+		for (const item of items) {
+			const itemPath = path.join(folderPath, item);
+
+			try {
+				const isDirectory = fs.statSync(itemPath).isDirectory();
+
+				if (isDirectory) {
+					clearFolder(itemPath);
+					fs.rmdirSync(itemPath);
+				} else {
+					fs.unlinkSync(itemPath);
+				}
+			} catch (error: any) {
+				log.error(`Ошибка при обработке ${itemPath}:`, error?.message);
+			}
+		}
+
+		log.info(`Папка ${folderPath} очищена.`);
+	} catch (error: any) {
+		log.error(`Ошибка при очистке папки ${folderPath}:`, error?.message);
 	}
 }

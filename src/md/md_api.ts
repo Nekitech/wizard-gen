@@ -1,8 +1,11 @@
 import path from 'node:path';
-import fs from 'fs-extra';
+import { log } from '@clack/prompts';
 
+import fs from 'fs-extra';
 import matter from 'gray-matter';
-import { connectGoogleApiTable } from '../gsheets/connect';
+import color from 'picocolors';
+
+import { Excel } from '../gsheets/excel';
 
 /**
  * Преобразует значение в зависимости от его типа.
@@ -46,18 +49,19 @@ function processObject(obj: any, types: any[]): any {
 	return result;
 }
 
-export async function page_generation(name_page: string, gsheets_data: any) {
+export async function page_generation(name_page: string, gsheets_data: any, gsh: Excel) {
 	const dir_path = path.resolve(process.cwd(), `src/content/${name_page}`);
 	const md_path = path.join(dir_path, `${name_page}.md`);
 
 	if (!fs.existsSync(dir_path)) {
 		fs.mkdirSync(dir_path, { recursive: true });
 	}
-	const gsh = await connectGoogleApiTable();
+
 	const types_by_name_page = (await gsh.getRowsBySheetName('Структура данных', 1)).filter(item => item.type === name_page);
 
 	const data = gsheets_data.map(obj => processObject(obj, types_by_name_page));
 	const new_content = matter.stringify('', { [name_page]: data });
 
 	fs.writeFileSync(md_path, new_content, 'utf-8');
+	log.message(`Контент страницы ${color.green(name_page)} успешно записался в файл ✅`);
 }
