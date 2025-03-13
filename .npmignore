@@ -2,10 +2,11 @@ node_modules
 creds.json
 .env
 .idea
-src/src/**/*.*\
+src/src/**/*.*
 content_generator/venv
 credentials.json
 
-dist/src/**
-dist/.env
-dist/credentials.json
+dist/**
+!dist/index.cjs
+!dist/index.js
+!dist/templates/**

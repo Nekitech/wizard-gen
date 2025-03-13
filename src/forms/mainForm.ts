@@ -24,14 +24,14 @@ export const mainForm = [
 		label: 'Generating comments',
 		hint: 'Generating comments',
 	},
-	{
-		value: 'generate_news',
-		label: 'News generation',
-		hint: 'News generation',
-	},
-	{
-		value: 'config_styles',
-		label: 'Setting up site styles',
-		hint: 'Setting up site styles',
-	},
+	// {
+	// 	value: 'generate_news',
+	// 	label: 'News generation',
+	// 	hint: 'News generation',
+	// },
+	// {
+	// 	value: 'config_styles',
+	// 	label: 'Setting up site styles',
+	// 	hint: 'Setting up site styles',
+	// },
 ];
