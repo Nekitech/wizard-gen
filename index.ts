@@ -8,9 +8,9 @@ import { update_page } from './src/functions/update_page';
 
 async function main() {
 	prompt.intro(
-		`${color.bgCyanBright(
+		`✨ ${color.bgCyanBright(
 			color.black('Welcome. Below are the options that you can use to create or customization of the site'),
-		)}`,
+		)} ✨`,
 	);
 
 	await prompt.group({
