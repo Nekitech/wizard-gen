@@ -14,11 +14,11 @@ export const mainForm = [
 		label: 'Fill Google Sheet table',
 		hint: 'Fill Google Sheet table',
 	},
-	{
-		value: 'update_page',
-		label: 'Update page',
-		hint: 'Обновить md файл страницы актуальными данными из Google Sheets листа',
-	},
+	// {
+	// 	value: 'update_page',
+	// 	label: 'Update page',
+	// 	hint: 'Обновить md файл страницы актуальными данными из Google Sheets листа',
+	// },
 	{
 		value: 'generate_comments',
 		label: 'Generating comments',
