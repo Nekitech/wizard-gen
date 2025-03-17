@@ -1,5 +1,5 @@
-import os
 import json
+import os
 import sys
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -9,7 +9,6 @@ from content_generator.helpers import result_to_json
 from content_generator.llm_module import send_to_gemini
 
 from dotenv import load_dotenv
-
 
 load_dotenv('.env')
 example_collection = """
@@ -46,9 +45,9 @@ example_collection = """
         });
 """
 
+
 def generate_collection(params):
     data = json.loads(params)
-    google_api_key = os.getenv("GEMINIAPI")
     template = f"""
         Cгенерируй коллекцию для astro для .md файла {data['typePage']}, на основе данного объекта: 
         {data}
@@ -60,6 +59,6 @@ def generate_collection(params):
         Соотв, все названия заменяются согласно переданным данным. Также должно присутствовать присваивание 
         в соотв. названую переменную - collection: const {data['typePage']}Collection = defineCollection(...)
     """
-    result = send_to_gemini(template, google_api_key)
+    result = send_to_gemini(template)
     print(result)
     return json.dumps(result_to_json(result))

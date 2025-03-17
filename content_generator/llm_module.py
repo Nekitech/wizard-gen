@@ -1,8 +1,11 @@
-import requests
 import json
+import os
+
+import requests
 
 
-def send_to_gemini(prompt, google_api_key, model="gemini-2.0-flash"):
+def send_to_gemini(prompt, model="gemini-2.0-flash"):
+    google_api_key = os.getenv("GEMINIAPI")
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={google_api_key}"
     headers = {
         "Content-Type": "application/json"
