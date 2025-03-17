@@ -1,15 +1,15 @@
 import os
 import sys
-
-import gspread
-from dotenv import load_dotenv
-from google.oauth2.service_account import Credentials
 import time
+
+from dotenv import load_dotenv
+
+from content_generator.constants import ListsNames
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
-from content_generator.helpers import result_to_json, load_credentials
+from content_generator.helpers import result_to_json, get_google_sheet
 from content_generator.llm_module import send_to_gemini
 
 load_dotenv('.env')
@@ -19,34 +19,11 @@ def dict_to_row(data_dict, headers):
     return [str(data_dict.get(header, '')) for header in headers]
 
 
-
 def main():
-    google_sheet_url = os.getenv("GOOGLE_SHEET_URL")
-    google_api_key = os.getenv("GEMINIAPI")
-    google_credentials = load_credentials()
-
-    if not google_sheet_url:
-        raise ValueError("URL Google Sheets не найден в .env файле")
-
-    scopes = [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive"
-    ]
-
-    credentials = Credentials.from_service_account_info(
-        info=google_credentials, scopes=scopes
-    )
-    gc = gspread.authorize(credentials)
-
-    try:
-        spreadsheet_id = google_sheet_url.split('/')[-1]  # Извлечение ID из URL
-        spreadsheet = gc.open_by_key(spreadsheet_id)
-    except Exception as e:
-        print(f"Ошибка при доступе к Google Sheets: {e}")
-        exit(1)
+    spreadsheet = get_google_sheet()
 
     # Шаг 1: Сбор семантического ядра (первый лист)
-    semantic_core_worksheet = spreadsheet.get_worksheet(0)  # Первый лист
+    semantic_core_worksheet = spreadsheet.worksheet(ListsNames.SEMANTIC_CORE.value)  # Первый лист
     semantic_core_data = semantic_core_worksheet.col_values(1)  # Первая колонка
     semantic_core = [item.strip() for item in semantic_core_data if item.strip()]
     semantic_core = semantic_core[1:]
@@ -56,7 +33,7 @@ def main():
     for i in range(3, len(spreadsheet.worksheets())):  # Начинаем с четвёртого листа
         worksheet = spreadsheet.get_worksheet(i)
         worksheet_title = worksheet.title
-        if worksheet_title != "comments":
+        if worksheet_title != ListsNames.COMMENTS.value:
             print(f"Лист '{worksheet_title}' - не коментарии")
             continue
 
@@ -79,8 +56,8 @@ def main():
                 Ответ на запрос верни в формате json: {json_template}"""
 
             # Отправка запроса в Gemini
-            response_gemini = send_to_gemini(template, google_api_key)
-            
+            response_gemini = send_to_gemini(template)
+
             if response_gemini:
                 response_gemini = result_to_json(response_gemini)
                 print("Ответ:")
@@ -92,7 +69,7 @@ def main():
                             worksheet.update_cell(index + 2, col_index + 1, row_data[col_index])
                         except Exception as e:
                             print(f"Ошибка при работе с Google Sheets: {e}")
-                
+
             else:
                 print('error :(')
             time.sleep(10)
