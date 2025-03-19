@@ -1,9 +1,9 @@
 import path from 'node:path';
 import process from 'node:process';
 import { log, spinner } from '@clack/prompts';
-import { connectGoogleApiTable } from '../gsheets/connect';
 import { clearFolder } from '../helpers/file_system';
-import { page_generation } from '../md/md_api';
+import { connectGoogleApiTable } from '../services/gsheets/connect';
+import { page_generation } from '../services/md/md_api';
 
 export async function update_page() {
 	try {

@@ -59,7 +59,7 @@ export async function page_generation(name_page: string, gsheets_data: any, gsh:
 
 	const types_by_name_page = (await gsh.getRowsBySheetName('Структура данных', 1)).filter(item => item.type === name_page);
 
-	const data = gsheets_data.map(obj => processObject(obj, types_by_name_page));
+	const data = gsheets_data.map((obj: any) => processObject(obj, types_by_name_page));
 	const new_content = matter.stringify('', { [name_page]: data });
 
 	fs.writeFileSync(md_path, new_content, 'utf-8');

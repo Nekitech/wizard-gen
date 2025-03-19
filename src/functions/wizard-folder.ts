@@ -7,7 +7,6 @@ export const SCHEME_FILE = path.join(WIZARD_DIR, 'scheme.json');
 
 /**
  * Проверяет существование схемы и предлагает действия
- * @returns {Promise<object | null>}
  */
 export async function checkOrCreateScheme() {
 	if (!fs.existsSync(WIZARD_DIR)) {

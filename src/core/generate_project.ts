@@ -1,13 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-import { cancel, confirm, group, isCancel, log, select, spinner, text } from '@clack/prompts';
 import * as prompt from '@clack/prompts';
-import { connectGoogleApiTable } from '../gsheets/connect';
+import { cancel, confirm, group, isCancel, log, select, spinner, text } from '@clack/prompts';
+import { startTemplateByName } from '../functions/start_tempalte';
+import { checkOrCreateScheme, SCHEME_FILE } from '../functions/wizard-folder';
+import { call_python_with_spinner } from '../helpers/call_python';
 import { getDirectories, readFile } from '../helpers/file_system';
 import { isEmpty } from '../helpers/validation';
-import { checkOrCreateScheme, SCHEME_FILE } from '../process/wizard-folder';
-import { startTemplateByName } from '../template_module';
+import { connectGoogleApiTable } from '../services/gsheets/connect';
 import { TStructureDataItem } from '../types/types';
 
 /**
@@ -71,7 +72,7 @@ async function structure_data({ results }: any) {
 		}) as string;
 
 		const fieldNames: string[] = fieldsResult.split(',');
-		const types = await getFieldTypesWithDescription(fieldNames);
+		const types = await getFieldDataByTypePage(fieldNames);
 		structure.push(...types.map((el) => {
 			return {
 				...el,
@@ -84,11 +85,11 @@ async function structure_data({ results }: any) {
 }
 
 /**
- * Функция для выбора типов полей и добавления описания
+ * Функция возвращает название, описание и тип полей конкретного типа страниц
  * @param fieldNames - Массив имен полей
  * @returns Объект с типами полей и описаниями
  */
-async function getFieldTypesWithDescription(fieldNames: string[]) {
+async function getFieldDataByTypePage(fieldNames: string[]) {
 	const fieldTypes: string[] = ['string', 'number', 'boolean', 'date', 'array', 'object'];
 	const result: Omit<TStructureDataItem, 'type'>[] = [];
 
@@ -270,4 +271,7 @@ export async function generate_project() {
 
 	s.stop('Создание и заполнение листов завершено');
 	log.step(JSON.stringify(scheme_site, null, 4));
+
+	await call_python_with_spinner('slug_gen.py', 'main');
+	await call_python_with_spinner('main_gen.py', 'main');
 }

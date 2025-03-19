@@ -1,7 +1,7 @@
 import { defineConfig, Options } from 'tsup';
 
 export function createTsupConfig({
-	entry = ['src/index.ts'],
+	entry = ['index.ts'],
 	external = [],
 	noExternal = [],
 	platform = 'node',

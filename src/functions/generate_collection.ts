@@ -15,7 +15,7 @@ function write_to_config(collectionName: string, collectionCode: string): void {
 	const configPath = path.resolve(process.cwd(), 'src/content/config.ts');
 
 	try {
-		let configContent = '';
+		let configContent;
 
 		if (fs.existsSync(configPath)) {
 			configContent = fs.readFileSync(configPath, 'utf-8');
@@ -34,7 +34,7 @@ function write_to_config(collectionName: string, collectionCode: string): void {
 
 		if (exportMatch) {
 			// если export const collections уже существует, обновляем его
-			const existingExports = exportMatch[1].trim();
+			const existingExports = exportMatch[1]!.trim();
 			const newExport = `  ${collectionName}: ${collectionName}Collection,`;
 			const updatedExports = `export const collections = {\n${existingExports}\n${newExport}\n};`;
 
@@ -51,7 +51,7 @@ function write_to_config(collectionName: string, collectionCode: string): void {
 
 		console.log(`Коллекция "${collectionName}" успешно добавлена в config.ts.`);
 	} catch (error) {
-		console.error(`Ошибка при записи в config.ts: ${error.message}`);
+		console.error(`Ошибка при записи в config.ts: ${error?.message}`);
 	}
 }
 

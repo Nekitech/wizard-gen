@@ -2,8 +2,8 @@ import path from 'node:path';
 import { log } from '@clack/prompts';
 import { config } from 'dotenv';
 import { JWT } from 'google-auth-library';
-import { GoogleSpreadsheet } from 'google-spreadsheet';
-import { readJsonFileSync } from '../helpers/file_system';
+import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
+import { readJsonFileSync } from '../../helpers/file_system';
 
 export class Excel {
 	table: GoogleSpreadsheet | null = null;
@@ -34,7 +34,7 @@ export class Excel {
 	 * Инициализация таблицы.
 	 * @returns {Promise<void>}
 	 */
-	async init() {
+	async init(): Promise<void> {
 		await this.table?.loadInfo();
 	}
 
@@ -67,13 +67,13 @@ export class Excel {
 	 * @returns {Promise<any[] | undefined>} Массив объектов, представляющих строки.
 	 * @throws {Error} Если лист не найден.
 	 */
-	async getRowsBySheetName(sheetName: string, header = 2) {
+	async getRowsBySheetName(sheetName: string, header: number = 2): Promise<any[]> {
 		const sheet = this.table?.sheetsByTitle[sheetName];
 		if (!sheet) throw new Error(`Лист '${sheetName}' не найден`);
 		await sheet?.loadHeaderRow(header);
 
 		const data = await sheet?.getRows();
-		return data?.map(row => row.toObject());
+		return data?.map(row => row.toObject()) ?? [];
 	}
 
 	/**
@@ -116,7 +116,7 @@ export class Excel {
 	 * @param headers
 	 * @returns {Promise<GoogleSpreadsheetWorksheet>} Созданный или существующий лист.
 	 */
-	async createOrGetSheet(sheetName: string, headers?: string[]) {
+	async createOrGetSheet(sheetName: string, headers?: string[]): Promise<GoogleSpreadsheetWorksheet | undefined> {
 		let sheet = this.table?.sheetsByTitle[sheetName];
 		if (!sheet) {
 			sheet = await this.table?.addSheet(

@@ -1,0 +1,119 @@
+sequenceDiagram
+    actor USER
+    participant WIZARD
+    participant GOOGLESHEETS
+    participant LLM
+    USER ->> WIZARD: Начать (Анкета)
+
+    alt Если папки .WIZARD нет
+        WIZARD ->> WIZARD: Создание папки .WIZARD
+    end
+
+    alt Схема есть
+        USER ->> WIZARD: Запрос схемы сайта
+
+        alt Импортировать схему
+            WIZARD ->> WIZARD: Схема будет загружена из файла .WIZARD/scheme.json
+        else Создать новую
+            WIZARD ->> WIZARD: Будет создана новая схема
+        end
+
+    else Схемы нет
+        WIZARD ->> WIZARD: Будет создана новая схема
+    end
+
+    alt Успешно
+        WIZARD ->> GOOGLESHEETS: Подключение к Google Sheets
+        Note over WIZARD, GOOGLESHEETS: connectGoogleApiTable( $client_email, $private_key, $GOOGLE_SHEETS_TABLE_ID )
+        GOOGLESHEETS -->> WIZARD: Успешное подключение
+    else Ошибка
+        WIZARD ->> USER: Ошибка (Ошибка подключения)
+    end
+
+    WIZARD ->> USER: Запросить семантическое ядро
+    alt Ввод текстом
+        USER ->> WIZARD: Ввести текстом
+        Note over USER, WIZARD: { semantic_core } <= $text
+    else Ввод ссылки
+        USER ->> WIZARD: Ввести ссылку на текстовый файл
+        Note over USER, WIZARD: { semantic_core } <= $file_path
+    end
+
+    alt Успешно
+        WIZARD ->> USER: Запросить типы страниц
+        Note over WIZARD, USER: $type, $description
+        USER ->> WIZARD: Ввести типы страниц
+        Note over USER, WIZARD: { types_pages } <= types_pages( $type, $description )
+
+    else Ошибка
+        WIZARD ->> USER: Ошибка (Семантическое ядро)
+    end
+    alt Успешно
+        WIZARD ->> USER: Запросить названия полей, их тип и описание
+        USER ->> WIZARD: Ввести поля и их типы, описания
+        Note over USER, WIZARD: { data_structure } <= structure_data( $type_page, $field_name, $field_description, $field_description )
+
+    else Ошибка
+        WIZARD ->> USER: Ошибка (Типы страниц)
+    end
+    alt Успешно
+        WIZARD ->> USER: Выбор темплейта будущего сайта
+        Note over WIZARD, USER: $selected_template
+        USER ->> WIZARD: Выбрать из предлагаемых темплейтов
+        Note over USER, WIZARD: { select_template } <= select_template($selected_template)
+        WIZARD ->> WIZARD: Развертывание выбранного шаблона
+    else Ошибка
+        WIZARD ->> USER: Ошибка (Выбор темплейта)
+    end
+
+    WIZARD ->> GOOGLESHEETS: Создание и заполнение листа семантического ядра
+    GOOGLESHEETS -->> WIZARD: Лист semantic_core создан и заполнен
+    WIZARD ->> GOOGLESHEETS: Создание и заполнение листа с типами страниц
+    GOOGLESHEETS -->> WIZARD: Лист types_pages создан и заполнен
+    WIZARD ->> GOOGLESHEETS: Создание и заполнение листа со структурой данных (полями страниц)
+    GOOGLESHEETS -->> WIZARD: Лист structure_data создан и заполнен
+    WIZARD ->> GOOGLESHEETS: Создание листов для страниц
+    GOOGLESHEETS -->> WIZARD: Листы для страниц были созданы
+    opt Python-модуль
+        alt Успешно
+            WIZARD ->> WIZARD: Получить креды из env
+
+            alt Успешно
+                WIZARD ->> GOOGLESHEETS: Подключиться
+                Note over WIZARD, GOOGLESHEETS: load_credentials()
+                GOOGLESHEETS -->> WIZARD: Успешное подключение
+            else Ошибка
+                WIZARD ->> USER: Ошибка (Ошибка подключения)
+            end
+
+            WIZARD ->> LLM: Запрос на генерацию slug'ов для страниц
+            Note over WIZARD, LLM: send_to_gemini($prompt, $model)
+            LLM ->> GOOGLESHEETS: Получение объекта со slug'ми и его запись в таблицу
+
+            alt Успешно
+                WIZARD ->> LLM: Запрос на генерацию контента
+                Note over WIZARD, LLM: send_to_gemini($prompt, $model)
+                LLM -->> GOOGLESHEETS: Запись полученного контента в таблицу
+            else Ошибка
+                WIZARD ->> USER: Ошибка (Ошибка генерации контента)
+            end
+
+
+        else Ошибка
+            WIZARD ->> USER: Ошибка
+        end
+    end
+
+    alt Успешно
+        WIZARD ->> WIZARD: Генерация MD-файлов
+        WIZARD ->> GOOGLESHEETS: Запросить данные для MD-файлов
+        GOOGLESHEETS -->> WIZARD: Данные получены
+        WIZARD ->> WIZARD: Заполнение MD-файлов контентом
+        WIZARD ->> WIZARD: Генерация коллекций Astro
+        WIZARD ->> GOOGLESHEETS: Запросить типы полей страниц
+        GOOGLESHEETS -->> WIZARD: Типы полей получены
+        WIZARD ->> WIZARD: Создание коллекций на основе типов полей
+        WIZARD ->> USER: Завершено
+    else Ошибка
+        WIZARD ->> USER: Ошибка (Развертывание проекта)
+    end
