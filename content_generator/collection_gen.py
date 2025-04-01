@@ -10,7 +10,7 @@ from content_generator.llm_module import send_to_gemini
 
 from dotenv import load_dotenv
 
-load_dotenv('.env')
+load_dotenv(".env")
 example_collection = """
         const castAnimeCollection = defineCollection({
           type: "content",
@@ -49,15 +49,15 @@ example_collection = """
 def generate_collection(params):
     data = json.loads(params)
     template = f"""
-        Cгенерируй коллекцию для astro для .md файла {data['typePage']}, на основе данного объекта: 
-        {data}
+        Cгенерируй коллекцию для astro для .md файла {data["type"]}, на основе данного объекта: 
+        {data["list_fields"]}
         В ответе должно содержаться только объявление коллекции, без импорта библиотек или экспорта коллекции. У всех полей должны
         быть вызваны по итогу методы .describe() для описания предназначения поля. Не должно быть лишних и дополнительных комментариев.
         Ответ вернуть в виде json, где в поле collection будет содержаться сама коллекция в виде строки, по примеру:
         {example_collection}
         
         Соотв, все названия заменяются согласно переданным данным. Также должно присутствовать присваивание 
-        в соотв. названую переменную - collection: const {data['typePage']}Collection = defineCollection(...)
+        в соотв. названую переменную - collection: const {data["type"]}Collection = defineCollection(...)
     """
     result = send_to_gemini(template)
     print(result)

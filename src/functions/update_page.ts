@@ -1,14 +1,13 @@
 import path from 'node:path';
 import process from 'node:process';
 import { log, spinner } from '@clack/prompts';
-import { connectGoogleApiTable } from '../gsheets/connect';
+import { Excel } from '../gsheets/excel';
 import { clearFolder } from '../helpers/file_system';
 import { page_generation } from '../md/md_api';
 
-export async function update_page() {
+export async function update_page(gsh: Excel) {
 	try {
 		const s = spinner();
-		const gsh = await connectGoogleApiTable();
 
 		s.start('Получение типов страниц');
 		const types_pages = await gsh.getRowsBySheetName('Типы страниц');

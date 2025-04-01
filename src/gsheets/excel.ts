@@ -77,6 +77,31 @@ export class Excel {
 	}
 
 	/**
+	 * Получение всех строк из указанного листа с группировкой по заданному полю.
+	 * @param {string} sheetName - Название листа.
+	 * @param {number} [header] - Номер строки, содержащей заголовки.
+	 * @param {string} group_field - Поле, по которому нужно сгруппировать данные.
+	 * @returns {Promise<Record<string, any[]> | undefined>} Объект с группировкой по заданному полю.
+	 * @throws {Error} Если лист не найден.
+	 */
+	async getGroupedRowsByField(sheetName: string, header = 2, group_field: string) {
+		const sheet = this.table?.sheetsByTitle[sheetName];
+		if (!sheet) throw new Error(`Лист '${sheetName}' не найден`);
+		await sheet?.loadHeaderRow(header);
+
+		const data = await sheet?.getRows();
+		const rows = data?.map(row => row.toObject()) || [];
+
+		// Группировка по заданному полю
+		return rows.reduce((acc, row) => {
+			const key = row[group_field];
+			if (!acc[key]) acc[key] = [];
+			acc[key].push(row);
+			return acc;
+		}, {} as Record<string, any[]>);
+	}
+
+	/**
 	 * Удаление листа по названию.
 	 * @param {string} sheetName - Название листа.
 	 * @throws {Error} Если лист не найден.
@@ -108,6 +133,24 @@ export class Excel {
 
 		await rows[rowIndex]?.delete();
 		console.log(`Строка ${rowIndex} удалена из листа '${sheetName}'`);
+	}
+
+	/**
+	 * Удаляет все листы, кроме указанных в исключениях.
+	 * @param {string[]} [excludeSheets] - Массив названий листов, которые не нужно удалять.
+	 */
+	async deleteAllSheets(excludeSheets: string[] = []) {
+		const sheets = this.table?.sheetsByIndex ?? [];
+
+		for (const sheet of sheets) {
+			if (excludeSheets.includes(sheet.title)) {
+				console.log(`Skipping sheet: ${sheet.title}`);
+				continue;
+			}
+
+			await sheet.delete();
+			console.log(`Deleted sheet: ${sheet.title}`);
+		}
 	}
 
 	/**

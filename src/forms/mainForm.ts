@@ -4,15 +4,15 @@ export const mainForm = [
 		label: 'Generation of the site on the template',
 		hint: 'Generation of the site on the template',
 	},
-	{
-		value: 'generate_collection',
-		label: 'Generate collection',
-		hint: 'Generate collection of page',
-	},
+	// {
+	// 	value: 'generate_collection',
+	// 	label: 'Generate collection',
+	// 	hint: 'Generate collection of page',
+	// },
 	{
 		value: 'fill_google_sheet_table',
-		label: 'Fill Google Sheet table',
-		hint: 'Fill Google Sheet table',
+		label: 'Regenerate content',
+		hint: 'Regenerate content Google Sheets table',
 	},
 	// {
 	// 	value: 'update_page',

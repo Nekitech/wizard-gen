@@ -3,6 +3,7 @@ import * as process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { log, spinner } from '@clack/prompts';
 import * as ncp from 'node-calls-python';
+import color from 'picocolors';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,19 +14,18 @@ function getPythonBinPath(): string {
 		: path.join(venvDir, 'bin', 'python'); // Unix (Linux/macOS)
 }
 
-function getPythonPackagesPath(): string {
+function getPythonPackagesPath(version_python: string = '3.12'): string {
 	const venvDir = path.join(__dirname, '..', 'content_generator', 'venv');
 	return process.platform === 'win32'
 		? path.join(venvDir, 'Lib', 'site-packages') // Windows
-		: path.join(venvDir, 'lib', `python3.13`, 'site-packages'); // Unix (Linux/macOS)
+		: path.join(venvDir, 'lib', `python${version_python}`, 'site-packages'); // Unix (Linux/macOS)
 }
 
 export async function call_python_with_spinner(path_python_file: string, name_function: string, ...args: any[]) {
 	const s = spinner({ indicator: 'timer' });
-	s.start();
+	s.start(color.green(`Start call python script: ${path_python_file}`));
 	const res = await call_python(path_python_file, name_function, ...args);
-	s.stop();
-	s.message('completed the performance of the Python script');
+	s.stop(color.green(`Stop call python script: ${path_python_file}`));
 	return res;
 }
 
@@ -37,10 +37,9 @@ export async function call_python(path_python_file: string, name_function: strin
 
 		const pythonBinPath = getPythonBinPath();
 		py.setPythonExecutable(pythonBinPath);
-		const pythonPackagesPath = getPythonPackagesPath();
-		py.addImportPath(pythonPackagesPath);
 
-		console.log(pythonPackagesPath, absolute_path_python_file);
+		const pythonPackagesPath = getPythonPackagesPath('3.13');
+		py.addImportPath(pythonPackagesPath);
 
 		py.import(absolute_path_python_file, false)
 			.then((pymodule) => {

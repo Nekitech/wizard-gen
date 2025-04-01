@@ -11,3 +11,4 @@ src/content/**/*.*
 test/
 content_generator/venv
 credentials.json
+content_generator/__pycache__/**
