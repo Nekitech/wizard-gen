@@ -5,12 +5,11 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
 from dotenv import load_dotenv
-import time
 
 from content_generator.constants import ListsNames
 from content_generator.helpers import result_to_json, get_google_sheet
 
-from llm_module import send_to_gemini
+from llm_module import send_to_llm
 
 load_dotenv('.env')
 
@@ -67,33 +66,37 @@ def main():
         Имена и названия должны быть на русском.
         Например: для тайтла Магическая Битва для страницы season с перечеслением сезонов json должен выглядеть так: {json_template}
         В json'e должен лежать только 1 ключ slugs по которому будет лежать массив значений (название страниц).
-        Важно: если это страницы сезона, нужен список только сезонов и фильмов, если эта страница серий, нужен список всех серий всех сезонов + фильмы и т.д."""
+        Важно: если это страницы сезона, нужен список только сезонов и фильмов, если эта страница серий, нужен список ВСЕХ серий, ВСЕХ сезонов + фильмы, если страница актеров и съемочный группы: список всех актеров, операторов постановщиков и т.д., если это страаница героев: список всех персонажей тайтла
+        Важно: возвращай только json, без пояснений и другого текста!"""
+        
+        try:
 
-        response_gemini = send_to_gemini(template)
+            response_llm = send_to_llm(template)
 
-        if response_gemini:
-            col_index = 0
-            for index in range(len(headers)):
-                if headers[index] == "slug":
-                    col_index = index
-                    break
-            response_gemini = result_to_json(response_gemini)
-            print("Ответ:")
-            print(response_gemini)
-            try:
-                data = response_gemini["slugs"]
-                for index in range(len(data)):
-                    all_slugs.append(data[index])
-                    try:
-                        worksheet.update_cell(index + 2, col_index + 1, data[index])
-                    except Exception as e:
-                        print(f"Ошибка при работе с Google Sheets: {e}")
-            except Exception as e:
-                print("Json не правильной структуры :/")
+            if response_llm:
+                col_index = 0
+                for index in range(len(headers)):
+                    if headers[index] == "slug":
+                        col_index = index
+                        break
+                response_llm = result_to_json(response_llm)
+                print("Ответ:")
+                print(response_llm)
+                try:
+                    data = response_llm["slugs"]
+                    for index in range(len(data)):
+                        all_slugs.append(data[index])
+                        try:
+                            worksheet.update_cell(index + 2, col_index + 1, data[index])
+                        except Exception as e:
+                            print(f"Ошибка при работе с Google Sheets: {e}")
+                except Exception as e:
+                    print("Json не правильной структуры :/")
+            else:
+                print('Не получили ответа от llm')
+        except Exception as e:
+            print(f"Error: {e}")
 
-        else:
-            print('error :(')
-        time.sleep(10)
         print(f"Лист '{worksheet_title}' успешно обработан.")
 
     # Заполнение страницы комментариев
@@ -113,4 +116,4 @@ def main():
 
     print("Все листы обработаны.")
 
-# main()
+main()

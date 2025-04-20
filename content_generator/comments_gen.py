@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 
 from dotenv import load_dotenv
 
@@ -10,7 +9,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
 from content_generator.helpers import result_to_json, get_google_sheet
-from content_generator.llm_module import send_to_gemini
+from content_generator.llm_module import send_to_llm
 
 load_dotenv('.env')
 
@@ -56,23 +55,27 @@ def main():
                 Ответ на запрос верни в формате json: {json_template}"""
 
             # Отправка запроса в Gemini
-            response_gemini = send_to_gemini(template)
+            try:
+                
+                response_llm = send_to_llm(template)
 
-            if response_gemini:
-                response_gemini = result_to_json(response_gemini)
-                print("Ответ:")
-                print(response_gemini)
-                row_data = dict_to_row(response_gemini, headers)
-                for col_index in range(len(headers)):
-                    if row_data[col_index] and headers[col_index] != "slug":
-                        try:
-                            worksheet.update_cell(index + 2, col_index + 1, row_data[col_index])
-                        except Exception as e:
-                            print(f"Ошибка при работе с Google Sheets: {e}")
+                if response_llm:
+                    response_llm = result_to_json(response_llm)
+                    print("Ответ:")
+                    print(response_llm)
+                    row_data = dict_to_row(response_llm, headers)
+                    for col_index in range(len(headers)):
+                        if row_data[col_index] and headers[col_index] != "slug":
+                            try:
+                                worksheet.update_cell(index + 2, col_index + 1, row_data[col_index])
+                            except Exception as e:
+                                print(f"Ошибка при работе с Google Sheets: {e}")
 
-            else:
-                print('error :(')
-            time.sleep(10)
+                else:
+                    print('Не удалось получить ответ от нейронки')
+
+            except Exception as e:
+                print(f"Error: {e}")
 
         print(f"Лист '{worksheet_title}' успешно обработан.")
 
