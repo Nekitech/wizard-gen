@@ -3,13 +3,12 @@ import sys
 
 from dotenv import load_dotenv
 
-from content_generator.constants import ListsNames
-
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
 from content_generator.helpers import result_to_json, get_google_sheet
 from content_generator.llm_module import send_to_llm
+from content_generator.constants import ListsNames
 
 load_dotenv('.env')
 
@@ -52,7 +51,7 @@ def main():
                 Cемантическое ядро: {semantic_core}
                 Для страницы: {slug}
                 Нужно сгенерировать поля: text - текст коментария, name - имя пользователя (может быть как имя, так и ник или аноним)
-                Ответ на запрос верни в формате json: {json_template}"""
+                Ответ на запрос верни в формате json: {json_template}, без дополнительных пояснений и другого текста!"""
 
             # Отправка запроса в Gemini
             try:
