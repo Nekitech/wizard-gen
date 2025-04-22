@@ -56,9 +56,11 @@ def main():
         data = worksheet.get_all_records()
         headers = worksheet.row_values(1)
         if worksheet_title == "page_index":
+            title = os.getenv("TITLE")
             desc = {"description": "Описание главной страницы", "h1": "Заголовок на странице",
                     "title": "Загловок файла", "text": "Текст страницы с описанием тайтла", "url": "url"}
             template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о сериале. 
+                Тайтл: {title}
                 Cемантическое ядро: {semantic_core}
                 Описание страницы: это главная страница сайта
                 Нужно сгенерировать поля: {desc}
@@ -106,8 +108,10 @@ def main():
             # if not slug or not keywords:
             #     print(f"Пропускаю строку {index + 1}: отсутствуют slug или keywords.")
             #     continue
+            title = os.getenv("TITLE")
 
-            template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о сериале. 
+            template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о тайтле. 
+                Тайтл: {title}
                 Cемантическое ядро: {semantic_core}
                 Описание страницы: {page_types.get(worksheet_title, '')}
                 Для страницы: {slug}
