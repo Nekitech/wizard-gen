@@ -35,6 +35,9 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
+      wizard-gen:
+        specifier: ^0.0.25
+        version: 0.0.25
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^4.1.0
@@ -2358,6 +2361,10 @@ packages:
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
     engines: {node: '>= 8'}
+    hasBin: true
+
+  wizard-gen@0.0.25:
+    resolution: {integrity: sha512-hxlYfecAS7a8VAmBSOazF7Ad+zb+Pu3ViKLCqHOhaE98tI9J74ZkGhrI+HvlyoTWfxPl69wOwrL9nDxXegOUUg==}
     hasBin: true
 
   word-wrap@1.2.5:
@@ -4931,6 +4938,22 @@ snapshots:
   which@2.0.2:
     dependencies:
       isexe: 2.0.0
+
+  wizard-gen@0.0.25:
+    dependencies:
+      '@clack/prompts': 0.10.0
+      dotenv: 16.4.7
+      fs-extra: 11.3.0
+      google-auth-library: 9.15.1
+      google-spreadsheet: 4.1.4(google-auth-library@9.15.1)
+      gray-matter: 4.0.3
+      node-calls-python: 1.11.1
+      picocolors: 1.1.1
+      typescript: 5.7.3
+    transitivePeerDependencies:
+      - debug
+      - encoding
+      - supports-color
 
   word-wrap@1.2.5: {}
 

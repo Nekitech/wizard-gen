@@ -1,17 +1,17 @@
 import path from 'node:path';
 import process from 'node:process';
 import { log, spinner } from '@clack/prompts';
-import { connectGoogleApiTable } from '../gsheets/connect';
+import { LISTS } from '../constants';
+import { Excel } from '../gsheets/excel';
 import { clearFolder } from '../helpers/file_system';
 import { page_generation } from '../md/md_api';
 
-export async function update_page() {
+export async function update_md_content(gsh: Excel) {
 	try {
 		const s = spinner();
-		const gsh = await connectGoogleApiTable();
 
 		s.start('Получение типов страниц');
-		const types_pages = await gsh.getRowsBySheetName('Типы страниц');
+		const types_pages = await gsh.getRowsBySheetName(LISTS.types_pages);
 		const type_pages_options = types_pages?.map(item => item.index);
 		s.stop('Страницы получены');
 
@@ -24,7 +24,7 @@ export async function update_page() {
 		try {
 			for (const type of type_pages_options) {
 				try {
-					const data = await gsh.getRowsBySheetName(`pages_${type}`, 1);
+					const data = await gsh.getRowsBySheetName(`${LISTS.pages}${type}`, 1);
 					await page_generation(type, data, gsh);
 				} catch (error) {
 					log.error(`Ошибка при обработке страницы "${type}":`, error?.message);
