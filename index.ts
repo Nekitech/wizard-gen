@@ -4,7 +4,6 @@ import { mainForm } from './src/forms/mainForm';
 import { fillGoogleSheetTable } from './src/functions/fill_google_sheet_table';
 import { generate_project } from './src/functions/generate_project';
 import { sync_md } from './src/functions/sync_md';
-import { testPythonEnv } from './src/functions/test_python';
 
 async function main() {
 	prompt.intro(

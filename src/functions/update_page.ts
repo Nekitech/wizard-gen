@@ -12,7 +12,7 @@ export async function update_md_content(gsh: Excel) {
 
 		s.start('Получение типов страниц');
 		const types_pages = await gsh.getRowsBySheetName(LISTS.types_pages);
-		const type_pages_options = types_pages?.map(item => item.index);
+		const type_pages_options = types_pages?.map(item => item.type);
 		s.stop('Страницы получены');
 
 		s.start('Удаление md-файлов в src/content');
@@ -24,7 +24,7 @@ export async function update_md_content(gsh: Excel) {
 		try {
 			for (const type of type_pages_options) {
 				try {
-					const data = await gsh.getRowsBySheetName(`${LISTS.pages}${type}`, 1);
+					const data = await gsh.getRowsBySheetName(`${LISTS.pages}${type}`);
 					await page_generation(type, data, gsh);
 				} catch (error) {
 					log.error(`Ошибка при обработке страницы "${type}":`, error?.message);
