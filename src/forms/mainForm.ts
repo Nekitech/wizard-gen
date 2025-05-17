@@ -19,6 +19,12 @@ export const mainForm = [
 		label: 'Update pages',
 		hint: 'Обновить md файл страницы актуальными данными из Google Sheets листа',
 	},
+	{
+		value: 'sync_md',
+		label: 'Sync MD',
+		hint: 'Sync MD',
+	},
+
 	// {
 	// 	value: 'generate_comments',
 	// 	label: 'Generating comments',

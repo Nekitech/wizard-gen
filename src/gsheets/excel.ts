@@ -40,6 +40,14 @@ export class Excel {
 	}
 
 	/**
+	 * Получение таблицы.
+	 * @returns {GoogleSpreadsheet | null} Таблица.
+	 */
+	get table(): GoogleSpreadsheet | null {
+		return this.#table;
+	}
+
+	/**
 	 * Получение названий всех листов в таблице.
 	 * @returns {Promise<string[] | undefined>} Массив названий листов.
 	 */
