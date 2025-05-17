@@ -30,10 +30,6 @@ def main():
     semantic_core = semantic_core[1:]
     print(f"Семантическое ядро собрано: {len(semantic_core)} элементов.")
 
-    spreadsheet = get_google_sheet()  # Шаг 1: Сбор семантического ядра (первый лист) semantic_core_worksheet = spreadsheet.worksheet(ListsNames.SEMANTIC_CORE.value) semantic_core_data = semantic_core_worksheet.col_values(1) semantic_core = [item.strip() for item in semantic_core_data if item.strip()]
-    semantic_core = semantic_core[1:]
-    print(f"Семантическое ядро собрано: {len(semantic_core)} элементов.")
-
     # Шаг 2: Сбор типов страниц и их описаний (второй лист)
     page_types_worksheet = spreadsheet.worksheet(ListsNames.TYPES_PAGES.value)
     page_types_data = page_types_worksheet.get_all_records()

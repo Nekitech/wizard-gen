@@ -8,11 +8,17 @@ import { connectGoogleApiTable } from '../gsheets/connect';
 import { call_python_with_spinner } from '../helpers/call_python';
 import { getDirectories, readFile } from '../helpers/file_system';
 import { isEmpty } from '../helpers/validation';
-import { checkOrCreateScheme, SCHEME_FILE } from '../process/wizard-folder';
+import { getScheme, SCHEME_FILE } from '../process/wizard-folder';
 import { startTemplateByName } from '../template_module';
 import { TStructureDataItem } from '../types/types';
 import { generate_collection } from './generate_collection';
-import { update_page } from './update_page';
+import { update_md_content } from './update_page';
+
+type TPagesData = {
+	type: string;
+	description: string;
+
+};
 
 /**
  * Запрашивает у пользователя названия страниц и их описания.
@@ -31,7 +37,7 @@ async function types_pages() {
 	}) as string;
 
 	const pages: string[] = result.split(',');
-	const pagesData = [];
+	const pagesData: TPagesData[] = [];
 
 	for (const page of pages) {
 		const description: string = await prompt.text({
@@ -182,7 +188,7 @@ export async function generate_project() {
 		};
 	});
 
-	let scheme_site = await checkOrCreateScheme();
+	let scheme_site = await getScheme();
 
 	const gsh = await connectGoogleApiTable();
 
@@ -273,12 +279,13 @@ export async function generate_project() {
 	await call_python_with_spinner('slug_gen.py', 'main');
 	await call_python_with_spinner('main_gen.py', 'main');
 
+	s.stop('Создание и заполнение листов завершено');
+
 	// обновление .md файлов контента
-	await update_page(gsh);
+	await update_md_content(gsh);
 
 	// генерация коллекций
 	await generate_collection(gsh);
 
-	s.stop('Создание и заполнение листов завершено');
 	log.step(JSON.stringify(scheme_site, null, 4));
 }

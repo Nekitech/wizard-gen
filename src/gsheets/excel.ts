@@ -6,7 +6,8 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { readJsonFileSync } from '../helpers/file_system';
 
 export class Excel {
-	table: GoogleSpreadsheet | null = null;
+	#table: GoogleSpreadsheet | null = null;
+	#scope = ['https://www.googleapis.com/auth/spreadsheets'];
 
 	/**
 	 * Конструктор класса Excel.
@@ -22,9 +23,9 @@ export class Excel {
 			const serviceAccountAuth = new JWT({
 				email: creds?.client_email,
 				key: creds?.private_key,
-				scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+				scopes: this.#scope,
 			});
-			this.table = new GoogleSpreadsheet(process.env.GOOGLE_SHEETS_TABLE_ID ?? '', serviceAccountAuth);
+			this.#table = new GoogleSpreadsheet(process.env.GOOGLE_SHEETS_TABLE_ID ?? '', serviceAccountAuth);
 		} catch (e: any) {
 			throw new Error(e.message);
 		}
@@ -35,7 +36,7 @@ export class Excel {
 	 * @returns {Promise<void>}
 	 */
 	async init() {
-		await this.table?.loadInfo();
+		await this.#table?.loadInfo();
 	}
 
 	/**
@@ -43,7 +44,7 @@ export class Excel {
 	 * @returns {Promise<string[] | undefined>} Массив названий листов.
 	 */
 	async getNameSheets() {
-		return this.table?.sheetsByIndex.map(sheet => sheet.title);
+		return this.#table?.sheetsByIndex.map(sheet => sheet.title);
 	}
 
 	/**
@@ -53,7 +54,7 @@ export class Excel {
 	 * @throws {Error} Если лист не найден.
 	 */
 	async addRow(sheetName: string, rowData: any) {
-		const sheet = this.table?.sheetsByTitle[sheetName];
+		const sheet = this.#table?.sheetsByTitle[sheetName];
 		if (!sheet) throw new Error(`Лист '${sheetName}' не найден`);
 
 		await sheet.addRow(rowData);
@@ -68,7 +69,7 @@ export class Excel {
 	 * @throws {Error} Если лист не найден.
 	 */
 	async getRowsBySheetName(sheetName: string, header = 2) {
-		const sheet = this.table?.sheetsByTitle[sheetName];
+		const sheet = this.#table?.sheetsByTitle[sheetName];
 		if (!sheet) throw new Error(`Лист '${sheetName}' не найден`);
 		await sheet?.loadHeaderRow(header);
 
@@ -85,7 +86,7 @@ export class Excel {
 	 * @throws {Error} Если лист не найден.
 	 */
 	async getGroupedRowsByField(sheetName: string, header = 2, group_field: string) {
-		const sheet = this.table?.sheetsByTitle[sheetName];
+		const sheet = this.#table?.sheetsByTitle[sheetName];
 		if (!sheet) throw new Error(`Лист '${sheetName}' не найден`);
 		await sheet?.loadHeaderRow(header);
 
@@ -107,7 +108,7 @@ export class Excel {
 	 * @throws {Error} Если лист не найден.
 	 */
 	async deleteSheet(sheetName: string) {
-		const sheet = this.table?.sheetsByTitle[sheetName];
+		const sheet = this.#table?.sheetsByTitle[sheetName];
 		if (!sheet) throw new Error(`Лист '${sheetName}' не найден`);
 
 		await sheet.delete();
@@ -121,7 +122,7 @@ export class Excel {
 	 * @throws {Error} Если лист не найден или индекс строки неверный.
 	 */
 	async deleteRow(sheetName: string, rowIndex: number) {
-		const sheet = this.table?.sheetsByTitle[sheetName];
+		const sheet = this.#table?.sheetsByTitle[sheetName];
 		if (!sheet) throw new Error(`Лист '${sheetName}' не найден`);
 
 		await sheet.loadCells();
@@ -140,7 +141,7 @@ export class Excel {
 	 * @param {string[]} [excludeSheets] - Массив названий листов, которые не нужно удалять.
 	 */
 	async deleteAllSheets(excludeSheets: string[] = []) {
-		const sheets = this.table?.sheetsByIndex ?? [];
+		const sheets = this.#table?.sheetsByIndex ?? [];
 
 		for (const sheet of sheets) {
 			if (excludeSheets.includes(sheet.title)) {
@@ -160,9 +161,9 @@ export class Excel {
 	 * @returns {Promise<GoogleSpreadsheetWorksheet>} Созданный или существующий лист.
 	 */
 	async createOrGetSheet(sheetName: string, headers?: string[]) {
-		let sheet = this.table?.sheetsByTitle[sheetName];
+		let sheet = this.#table?.sheetsByTitle[sheetName];
 		if (!sheet) {
-			sheet = await this.table?.addSheet(
+			sheet = await this.#table?.addSheet(
 				{
 					title: sheetName,
 					headerValues: headers,

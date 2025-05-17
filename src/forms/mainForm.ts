@@ -14,16 +14,16 @@ export const mainForm = [
 		label: 'Regenerate content',
 		hint: 'Regenerate content Google Sheets table',
 	},
-	// {
-	// 	value: 'update_page',
-	// 	label: 'Update page',
-	// 	hint: 'Обновить md файл страницы актуальными данными из Google Sheets листа',
-	// },
 	{
-		value: 'generate_comments',
-		label: 'Generating comments',
-		hint: 'Generating comments',
+		value: 'update_pages',
+		label: 'Update pages',
+		hint: 'Обновить md файл страницы актуальными данными из Google Sheets листа',
 	},
+	// {
+	// 	value: 'generate_comments',
+	// 	label: 'Generating comments',
+	// 	hint: 'Generating comments',
+	// },
 	// {
 	// 	value: 'generate_news',
 	// 	label: 'News generation',
