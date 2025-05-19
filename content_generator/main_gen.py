@@ -13,11 +13,12 @@ from content_generator.helpers import result_to_json, get_google_sheet
 # from helpers import result_to_json
 from llm_module import send_to_llm
 
-load_dotenv('.env')
+load_dotenv(".env")
 
 
 def dict_to_row(data_dict, headers):
-    return [str(data_dict.get(header, '')) for header in headers]
+    return [str(data_dict.get(header, "")) for header in headers]
+
 
 
 def main():
@@ -33,7 +34,7 @@ def main():
     # Шаг 2: Сбор типов страниц и их описаний (второй лист)
     page_types_worksheet = spreadsheet.worksheet(ListsNames.TYPES_PAGES.value)
     page_types_data = page_types_worksheet.get_all_records()
-    page_types = {row['type']: row['description'] for row in page_types_data}
+    page_types = {row["type"]: row["description"] for row in page_types_data}
     print(f"Типы страниц собраны: {len(page_types)} типов.")
 
     # Шаг 3: Сбор ключей и их описаний для каждого типа (третий лист)
@@ -41,9 +42,9 @@ def main():
     descriptions_data = descriptions_worksheet.get_all_records()
     descriptions = {}
     for row in descriptions_data:
-        page_type = row['type']
-        key_name = row['columnName']
-        key_description = row['columnDescription']
+        page_type = row["type"]
+        key_name = row["columnName"]
+        key_description = row["columnDescription"]
         if page_type not in descriptions:
             descriptions[page_type] = {}
         descriptions[page_type][key_name] = key_description
@@ -56,11 +57,14 @@ def main():
         data = worksheet.get_all_records()
         headers = worksheet.row_values(1)
         if worksheet_title == "page_index":
-            title = os.getenv("TITLE")
-            desc = {"description": "Описание главной страницы", "h1": "Заголовок на странице",
-                    "title": "Загловок файла", "text": "Текст страницы с описанием тайтла", "url": "url"}
+            desc = {
+                "description": "Описание главной страницы",
+                "h1": "Заголовок на странице",
+                "title": "Загловок файла",
+                "text": "Текст страницы с описанием тайтла",
+                "url": "url",
+            }
             template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о сериале. 
-                Тайтл: {title}
                 Cемантическое ядро: {semantic_core}
                 Описание страницы: это главная страница сайта
                 Нужно сгенерировать поля: {desc}
@@ -101,7 +105,7 @@ def main():
 
         # Получаем данные со второго и третьего столбца (slug и keywords)
         for index, row in enumerate(data):
-            slug = row.get('slug', '')
+            slug = row.get("slug", "")
             # keywords = row.get('keywords', '')
             # Ключевые слова: {keywords}
 
@@ -113,7 +117,7 @@ def main():
             template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о тайтле. 
                 Тайтл: {title}
                 Cемантическое ядро: {semantic_core}
-                Описание страницы: {page_types.get(worksheet_title, '')}
+                Описание страницы: {page_types.get(worksheet_title, "")}
                 Для страницы: {slug}
                 Нужно сгенерировать поля: {descriptions.get(worksheet_title, {})}
                 Ответ на запрос верни в формате json. Без дополнительных пояснений и другого текста!"""
