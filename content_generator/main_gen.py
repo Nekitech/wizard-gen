@@ -86,7 +86,7 @@ def main():
                             except Exception as e:
                                 print(f"Ошибка при работе с Google Sheets: {e}")
                 else:
-                    print('error :(')
+                    print("error :(")
                 time.sleep(5)
                 continue
             except Exception as e:
@@ -132,13 +132,14 @@ def main():
                     for col_index in range(len(headers)):
                         if row_data[col_index] and headers[col_index] != "slug":
                             try:
-                                worksheet.update_cell(index + 2, col_index + 1, row_data[col_index])
+                                worksheet.update_cell(
+                                    index + 2, col_index + 1, row_data[col_index]
+                                )
                             except Exception as e:
                                 print(f"Ошибка при работе с Google Sheets: {e}")
                 else:
-                    print('Ответ на запрос не был получен')
-            except Exception as e:
-                print(f"Error: {e}")
+                    print("error :(")
+            time.sleep(5)
 
         print(f"Лист '{worksheet_title}' успешно обработан.")
 
