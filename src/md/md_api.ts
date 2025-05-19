@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 import matter from 'gray-matter';
 import color from 'picocolors';
 
+import { LISTS } from '../constants';
 import { Excel } from '../gsheets/excel';
 
 /**
@@ -57,7 +58,7 @@ export async function page_generation(name_page: string, gsheets_data: any, gsh:
 		fs.mkdirSync(dir_path, { recursive: true });
 	}
 
-	const types_by_name_page = (await gsh.getRowsBySheetName('Структура данных', 1)).filter(item => item.type === name_page);
+	const types_by_name_page = (await gsh.getRowsBySheetName(LISTS.structure_data, 1)).filter(item => item.type === name_page);
 
 	const data = gsheets_data.map(obj => processObject(obj, types_by_name_page));
 	const new_content = matter.stringify('', { [name_page]: data });

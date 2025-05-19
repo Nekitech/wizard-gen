@@ -1,37 +1,38 @@
 {
-  "name": "wizard-gen",
-  "type": "module",
-  "version": "0.0.25",
-  "packageManager": "pnpm@9.5.0",
-  "bin": {
-    "wizard-gen": "bin/index.js"
-  },
-  "scripts": {
-    "build": "tsup index.ts --format esm,cjs && node copy-templates.js",
-    "lint": "eslint . --fix",
-    "dev": "npm run build && cd dist/ && node index.js",
-    "publish-packages": "npm run build && npm run lint && npm publish",
-    "postinstall": "npm run check-python && npm run install-python-deps",
-    "check-python": "python --version || echo 'Python не установлен. Установите Python и повторите попытку.'",
-    "install-python-deps": "node install_python_deps.js"
-  },
-  "dependencies": {
-    "@clack/prompts": "^0.10.0",
-    "dotenv": "^16.4.7",
-    "fs-extra": "^11.3.0",
-    "google-auth-library": "^9.15.1",
-    "google-spreadsheet": "^4.1.4",
-    "gray-matter": "^4.0.3",
-    "node-calls-python": "^1.11.1",
-    "picocolors": "^1.1.1",
-    "typescript": "^5.7.3"
-  },
-  "devDependencies": {
-    "@antfu/eslint-config": "^4.1.0",
-    "@changesets/cli": "^2.27.12",
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.12.0",
-    "eslint": "^9.19.0",
-    "tsup": "^8.3.6"
-  }
+	"name": "wizard-gen",
+	"type": "module",
+	"version": "0.0.25",
+	"packageManager": "pnpm@9.5.0",
+	"bin": {
+		"wizard-gen": "bin/index.js"
+	},
+	"scripts": {
+		"build": "tsup index.ts --format esm,cjs && node copy-templates.js",
+		"lint": "eslint . --fix",
+		"dev": "npm run build && cd dist/ && node index.js",
+		"publish-packages": "npm run build && npm run lint && npm publish",
+		"postinstall": "npm run check-python && npm run install-python-deps",
+		"check-python": "python --version || echo 'Python не установлен. Установите Python и повторите попытку.'",
+		"install-python-deps": "node install_python_deps.js"
+	},
+	"dependencies": {
+		"@clack/prompts": "^0.10.0",
+		"dotenv": "^16.4.7",
+		"fs-extra": "^11.3.0",
+		"google-auth-library": "^9.15.1",
+		"google-spreadsheet": "^4.1.4",
+		"gray-matter": "^4.0.3",
+		"node-calls-python": "^1.11.1",
+		"picocolors": "^1.1.1",
+		"typescript": "^5.7.3",
+		"wizard-gen": "^0.0.25"
+	},
+	"devDependencies": {
+		"@antfu/eslint-config": "^4.1.0",
+		"@changesets/cli": "^2.27.12",
+		"@types/fs-extra": "^11.0.4",
+		"@types/node": "^22.12.0",
+		"eslint": "^9.19.0",
+		"tsup": "^8.3.6"
+	}
 }
