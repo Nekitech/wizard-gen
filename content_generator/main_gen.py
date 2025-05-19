@@ -71,26 +71,23 @@ def main():
                 Ответ на запрос верни в формате json. 
                 Имена актеров и персонажей, названия тайтла и серий должны быть на русском.
 """
-            try:
-                response_llm = send_to_llm(template)
+            response_llm = send_to_llm(template)
 
-                if response_llm:
-                    response_llm = result_to_json(response_llm)
-                    print("Ответ:")
-                    print(response_llm)
-                    row_data = dict_to_row(response_llm, headers)
-                    for col_index in range(len(headers)):
-                        if row_data[col_index] and headers[col_index] != "slug":
-                            try:
-                                worksheet.update_cell(2, col_index + 1, row_data[col_index])
-                            except Exception as e:
-                                print(f"Ошибка при работе с Google Sheets: {e}")
-                else:
-                    print("error :(")
-                time.sleep(5)
-                continue
-            except Exception as e:
-                print(f"Ошибка: {e}")
+            if response_llm:
+                response_llm = result_to_json(response_llm)
+                print("Ответ:")
+                print(response_llm)
+                row_data = dict_to_row(response_llm, headers)
+                for col_index in range(len(headers)):
+                    if row_data[col_index] and headers[col_index] != "slug":
+                        try:
+                            worksheet.update_cell(2, col_index + 1, row_data[col_index])
+                        except Exception as e:
+                            print(f"Ошибка при работе с Google Sheets: {e}")
+            else:
+                print("error :(")
+            time.sleep(5)
+            continue
 
         worksheet_title = worksheet_title[5:]
         worksheet_title = worksheet_title.lstrip("_")
@@ -123,22 +120,21 @@ def main():
                 Ответ на запрос верни в формате json. Без дополнительных пояснений и другого текста!"""
 
             # Отправка запроса в Gemini
-            try:
-                response_llm = send_to_llm(template)
+            response_llm = send_to_llm(template)
 
-                if response_llm:
-                    response_llm = result_to_json(response_llm)
-                    row_data = dict_to_row(response_llm, headers)
-                    for col_index in range(len(headers)):
-                        if row_data[col_index] and headers[col_index] != "slug":
-                            try:
-                                worksheet.update_cell(
-                                    index + 2, col_index + 1, row_data[col_index]
-                                )
-                            except Exception as e:
-                                print(f"Ошибка при работе с Google Sheets: {e}")
-                else:
-                    print("error :(")
+            if response_llm:
+                response_llm = result_to_json(response_llm)
+                row_data = dict_to_row(response_llm, headers)
+                for col_index in range(len(headers)):
+                    if row_data[col_index] and headers[col_index] != "slug":
+                        try:
+                            worksheet.update_cell(
+                                index + 2, col_index + 1, row_data[col_index]
+                            )
+                        except Exception as e:
+                            print(f"Ошибка при работе с Google Sheets: {e}")
+            else:
+                print("error :(")
             time.sleep(5)
 
         print(f"Лист '{worksheet_title}' успешно обработан.")
