@@ -11,14 +11,13 @@ import time
 
 from content_generator.helpers import result_to_json, get_google_sheet
 # from helpers import result_to_json
-from llm_module import send_to_llm
+from llm_module import send_to_gemini
 
 load_dotenv(".env")
 
 
 def dict_to_row(data_dict, headers):
     return [str(data_dict.get(header, "")) for header in headers]
-
 
 
 def main():
@@ -71,13 +70,13 @@ def main():
                 Ответ на запрос верни в формате json. 
                 Имена актеров и персонажей, названия тайтла и серий должны быть на русском.
 """
-            response_llm = send_to_llm(template)
+            response_gemini = send_to_gemini(template)
 
-            if response_llm:
-                response_llm = result_to_json(response_llm)
+            if response_gemini:
+                response_gemini = result_to_json(response_gemini)
                 print("Ответ:")
-                print(response_llm)
-                row_data = dict_to_row(response_llm, headers)
+                print(response_gemini)
+                row_data = dict_to_row(response_gemini, headers)
                 for col_index in range(len(headers)):
                     if row_data[col_index] and headers[col_index] != "slug":
                         try:
@@ -88,11 +87,12 @@ def main():
                 print("error :(")
             time.sleep(5)
             continue
-
         worksheet_title = worksheet_title[5:]
         worksheet_title = worksheet_title.lstrip("_")
         if worksheet_title not in page_types:
-            print(f"Лист '{worksheet_title}' не содержит известного типа страницы. Пропускаю...")
+            print(
+                f"Лист '{worksheet_title}' не содержит известного типа страницы. Пропускаю..."
+            )
             continue
 
         print(f"Обработка листа '{worksheet_title}'...")
@@ -109,22 +109,20 @@ def main():
             # if not slug or not keywords:
             #     print(f"Пропускаю строку {index + 1}: отсутствуют slug или keywords.")
             #     continue
-            title = os.getenv("TITLE")
 
-            template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о тайтле. 
-                Тайтл: {title}
+            template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о сериале. 
                 Cемантическое ядро: {semantic_core}
                 Описание страницы: {page_types.get(worksheet_title, "")}
                 Для страницы: {slug}
                 Нужно сгенерировать поля: {descriptions.get(worksheet_title, {})}
-                Ответ на запрос верни в формате json. Без дополнительных пояснений и другого текста!"""
+                Ответ на запрос верни в формате json. """
 
             # Отправка запроса в Gemini
-            response_llm = send_to_llm(template)
+            response_gemini = send_to_gemini(template)
 
-            if response_llm:
-                response_llm = result_to_json(response_llm)
-                row_data = dict_to_row(response_llm, headers)
+            if response_gemini:
+                response_gemini = result_to_json(response_gemini)
+                row_data = dict_to_row(response_gemini, headers)
                 for col_index in range(len(headers)):
                     if row_data[col_index] and headers[col_index] != "slug":
                         try:
