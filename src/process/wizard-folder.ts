@@ -9,9 +9,7 @@ export const SCHEME_FILE = path.join(WIZARD_DIR, 'scheme.json');
  * Проверяет существование схемы и предлагает действия
  */
 export async function getScheme() {
-
 	if (!fs.existsSync(SCHEME_FILE)) {
-
 		if (!fs.existsSync(WIZARD_DIR)) {
 			fs.mkdirSync(WIZARD_DIR, { recursive: true });
 		}

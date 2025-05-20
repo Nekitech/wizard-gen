@@ -40,6 +40,14 @@ export class Excel {
 	}
 
 	/**
+	 * Получение таблицы.
+	 * @returns {GoogleSpreadsheet | null} Таблица.
+	 */
+	get table(): GoogleSpreadsheet | null {
+		return this.#table;
+	}
+
+	/**
 	 * Получение названий всех листов в таблице.
 	 * @returns {Promise<string[] | undefined>} Массив названий листов.
 	 */
@@ -68,7 +76,7 @@ export class Excel {
 	 * @returns {Promise<any[] | undefined>} Массив объектов, представляющих строки.
 	 * @throws {Error} Если лист не найден.
 	 */
-	async getRowsBySheetName(sheetName: string, header = 2) {
+	async getRowsBySheetName(sheetName: string, header = 1) {
 		const sheet = this.#table?.sheetsByTitle[sheetName];
 		if (!sheet) throw new Error(`Лист '${sheetName}' не найден`);
 		await sheet?.loadHeaderRow(header);
@@ -85,7 +93,7 @@ export class Excel {
 	 * @returns {Promise<Record<string, any[]> | undefined>} Объект с группировкой по заданному полю.
 	 * @throws {Error} Если лист не найден.
 	 */
-	async getGroupedRowsByField(sheetName: string, header = 2, group_field: string) {
+	async getGroupedRowsByField(sheetName: string, header = 1, group_field: string) {
 		const sheet = this.#table?.sheetsByTitle[sheetName];
 		if (!sheet) throw new Error(`Лист '${sheetName}' не найден`);
 		await sheet?.loadHeaderRow(header);

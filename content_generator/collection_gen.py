@@ -12,36 +12,18 @@ from dotenv import load_dotenv
 
 load_dotenv(".env")
 example_collection = """
-        const castAnimeCollection = defineCollection({
-          type: "content",
-          schema: z.object({
-              slug: z.string().describe('поле slug, нужно для составления url-ов'),
-              title: z.string(),
-              fio: z.string(),
-              isActor: z.boolean().optional(),
-            }),
-        });
-        
-        const quizCollection = defineCollection({
+        const newsCollection = defineCollection({
             type: "content",
-            schema: ({image}) =>
-                z.object({
-                    title: z.string(),
-                    description: z.string(),
-                    image: image(),
-                    questions: z.array(
-                        z.object({
-                            id: z.number(),
-                            question: z.string(),
-                            options: z.array(
-                                z.object({
-                                    text: z.string(),
-                                    isCorrect: z.boolean(),
-                                })
-                            ),
-                        })
-                    ),
+            schema: z.object({
+                news: z.array({
+                    z.object({
+                        title: z.string().describe('Название новости'),
+                        date: z.string().describe('Дата публикации'),
+                        text: z.string().describe('Текст новости'),
+                        category: z.string().describe('Категория'),
+                    }),
                 }),
+            })
         });
 """
 
@@ -53,6 +35,9 @@ def generate_collection(params):
         {data["list_fields"]}
         В ответе должно содержаться только объявление коллекции, без импорта библиотек или экспорта коллекции. У всех полей должны
         быть вызваны по итогу методы .describe() для описания предназначения поля. Не должно быть лишних и дополнительных комментариев.
+        Поле schema должно быть объявлено в виде z.object(
+            data["type"]: z.array({...})
+        ), где ... - это объект с полями, которые соответствуют полям из list_fields. Как в примере должно быть
         Ответ вернуть в виде json, где в поле collection будет содержаться сама коллекция в виде строки, по примеру:
         {example_collection}
         

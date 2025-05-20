@@ -4,15 +4,15 @@ import process from 'node:process';
 import * as prompt from '@clack/prompts';
 import { cancel, confirm, group, isCancel, log, select, spinner, text } from '@clack/prompts';
 import { LISTS } from '../constants';
-import { connectGoogleApiTable } from '../gsheets/connect';
+import { Excel } from '../gsheets/excel';
 import { call_python_with_spinner } from '../helpers/call_python';
 import { getDirectories, readFile } from '../helpers/file_system';
 import { isEmpty } from '../helpers/validation';
+import { generate_collection } from '../process/generate_collection';
 import { getScheme, SCHEME_FILE } from '../process/wizard-folder';
 import { startTemplateByName } from '../template_module';
 import { TStructureDataItem } from '../types/types';
-import { generate_collection } from './generate_collection';
-import { update_md_content } from './update_page';
+import { update_md_content } from './update_md_content';
 
 type TPagesData = {
 	type: string;
@@ -179,7 +179,7 @@ async function semantic_core() {
 	}
 }
 
-export async function generate_project() {
+export async function generate_project(gsh: Excel) {
 	const s = spinner();
 	const templates_options = getDirectories('templates').map((name) => {
 		return {
@@ -189,8 +189,6 @@ export async function generate_project() {
 	});
 
 	let scheme_site = await getScheme();
-
-	const gsh = await connectGoogleApiTable();
 
 	if (!scheme_site) {
 		scheme_site = await group({

@@ -15,10 +15,16 @@ export const mainForm = [
 		hint: 'Regenerate content Google Sheets table',
 	},
 	{
-		value: 'update_pages',
-		label: 'Update pages',
+		value: 'update_md',
+		label: 'Update Markdown',
 		hint: 'Обновить md файл страницы актуальными данными из Google Sheets листа',
 	},
+	{
+		value: 'sync_md',
+		label: 'Sync MD and Astro collection',
+		hint: 'Обновляет данные в markdown-файлах и после этого генерирует обновленный config.ts со всеми коллекциями',
+	},
+
 	// {
 	// 	value: 'generate_comments',
 	// 	label: 'Generating comments',
