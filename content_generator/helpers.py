@@ -83,3 +83,15 @@ def get_google_sheet() -> gspread.Spreadsheet:
     except Exception as e:
         print(f"Ошибка при доступе к Google Sheets: {e}")
         exit(1)
+
+def dict_to_row(data_dict, headers):
+    return [str(data_dict.get(header, '')) for header in headers]
+
+def read_template(abs_path: str) -> str:
+    try:
+        with open(abs_path, 'r', encoding='utf-8') as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        raise ValueError(f"Template file not found: {abs_path}")
+    except Exception as e:
+        raise ValueError(f"Error reading template: {str(e)}")

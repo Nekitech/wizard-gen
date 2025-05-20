@@ -7,15 +7,13 @@ sys.path.append(project_root)
 from dotenv import load_dotenv
 
 from content_generator.constants import ListsNames
-from content_generator.helpers import result_to_json, get_google_sheet
+from content_generator.helpers import result_to_json, get_google_sheet, dict_to_row, read_template
 
 from llm_module import send_to_llm
 
 load_dotenv('.env')
 
 
-def dict_to_row(data_dict, headers):
-    return [str(data_dict.get(header, '')) for header in headers]
 
 
 def main():
@@ -58,39 +56,48 @@ def main():
             continue
 
         print(f"Обработка листа '{worksheet_title}'...")
-
-        template = f"""Сгенерируй массив всех страниц типа {worksheet_title} : {page_types.get(worksheet_title, '')}, для тайтла - {name_title} 
-        Ответ на запрос верни в формате json. В json'e должен лежать только 1 ключ slugs по которому будет лежать массив строковых значений (название страниц).
-        Важно: если это страницы сезона, нужен список только сезонов и фильмов, если эта страница серий, нужен список ВСЕХ серий, ВСЕХ сезонов + фильмы, если страница актеров и съемочный группы: список всех актеров, операторов постановщиков и т.д., если это страаница героев: список всех персонажей тайтла
-        Важно: возвращай только json, без пояснений и другого текста!"""
+        description_of_page = page_types.get(worksheet_title, '')
+        slug_template_path = os.getenv("SLUG_TEMPLATE_PATH")
+        template = read_template(slug_template_path)
+        try:
+            template = template.format(
+                worksheet_title=worksheet_title,
+                description_of_page=description_of_page,
+                name_title=name_title
+            )
+        except Exception as e:
+            raise Exception(f"Wrong format of template, expected other params. {str(e)}")
+        # template = f"""Сгенерируй массив всех страниц типа {worksheet_title} : {description_of_page}, для тайтла - {name_title} 
+        # Ответ на запрос верни в формате json. В json'e должен лежать только 1 ключ slugs по которому будет лежать массив строковых значений (название страниц).
+        # Важно: если это страницы сезона, нужен список только сезонов и фильмов, если эта страница серий, нужен список ВСЕХ серий, ВСЕХ сезонов + фильмы, если страница актеров и съемочный группы: список всех актеров, операторов постановщиков и т.д., если это страаница героев: список всех персонажей тайтла
+        # Важно: возвращай только json, без пояснений и другого текста!"""
         
         try:
-
             response_llm = send_to_llm(template)
-
-            if response_llm:
-                col_index = 0
-                for index in range(len(headers)):
-                    if headers[index] == "slug":
-                        col_index = index
-                        break
-                response_llm = result_to_json(response_llm)
-                print("Ответ:")
-                print(response_llm)
-                try:
-                    data = response_llm["slugs"]
-                    for index in range(len(data)):
-                        all_slugs.append(data[index])
-                        try:
-                            worksheet.update_cell(index + 2, col_index + 1, data[index])
-                        except Exception as e:
-                            print(f"Ошибка при работе с Google Sheets: {e}")
-                except Exception as e:
-                    print("Json не правильной структуры :/")
-            else:
-                print('Не получили ответа от llm')
         except Exception as e:
             print(f"Error: {e}")
+
+        if response_llm:
+            col_index = 0
+            for index in range(len(headers)):
+                if headers[index] == "slug":
+                    col_index = index
+                    break
+            response_llm = result_to_json(response_llm)
+            print("Ответ:")
+            print(response_llm)
+            try:
+                data = response_llm["slugs"]
+                for index in range(len(data)):
+                    all_slugs.append(data[index])
+                    try:
+                        worksheet.update_cell(index + 2, col_index + 1, data[index])
+                    except Exception as e:
+                        print(f"Ошибка при работе с Google Sheets: {e}")
+            except Exception as e:
+                print("Json не правильной структуры :/")
+        else:
+            print('Не получили ответа от llm')
 
         print(f"Лист '{worksheet_title}' успешно обработан.")
 

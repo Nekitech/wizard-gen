@@ -5,9 +5,11 @@ dist/**
 .turbo
 .changeset
 creds.json
+__pycache__
 
 # папка для тестирования генерации файлов
 src/content/**/*.*
 test/
 content_generator/venv
+content_generator/exp
 credentials.json

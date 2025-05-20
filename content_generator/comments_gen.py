@@ -6,15 +6,13 @@ from dotenv import load_dotenv
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
-from content_generator.helpers import result_to_json, get_google_sheet
+from content_generator.helpers import result_to_json, get_google_sheet, dict_to_row, read_template
 from content_generator.llm_module import send_to_llm
 from content_generator.constants import ListsNames
 
 load_dotenv('.env')
 
 
-def dict_to_row(data_dict, headers):
-    return [str(data_dict.get(header, '')) for header in headers]
 
 
 def main():
@@ -47,35 +45,45 @@ def main():
                 print(f"Пропускаю строку {index + 1}: отсутствуют slug или keywords.")
                 continue
             title = os.getenv("TITLE")
-            template = f"""Сгенерируй 5 коментариев на основе семантического ядра и твоих знаний. 
-                Тайтл: {title}
-                Cемантическое ядро: {semantic_core}
-                Для страницы: {slug}
-                Нужно сгенерировать поля: text - текст коментария, name - имя пользователя (может быть как имя, так и ник или аноним)
-                Ответ на запрос верни в формате json: {json_template}, без дополнительных пояснений и другого текста!"""
+            coments_template_path = os.getenv("COMS_TEMPLATE_PATH")
+            template = read_template(coments_template_path)
+            try:
+                template = template.format(
+                    title=title,
+                    semantic_core=semantic_core,
+                    slug=slug,
+                    json_format=json_template
+                )
+            except Exception as e:
+                raise Exception(f"Wrong format of template, expected other params. {str(e)}")
+            # template = f"""Сгенерируй 5 коментариев на основе семантического ядра и твоих знаний. 
+            #     Тайтл: {title}
+            #     Cемантическое ядро: {semantic_core}
+            #     Для страницы: {slug}
+            #     Нужно сгенерировать поля: text - текст коментария, name - имя пользователя (может быть как имя, так и ник или аноним)
+            #     Ответ на запрос верни в формате json: {json_template}, без дополнительных пояснений и другого текста!"""
 
             # Отправка запроса в Gemini
             try:
-                
                 response_llm = send_to_llm(template)
-
-                if response_llm:
-                    response_llm = result_to_json(response_llm)
-                    print("Ответ:")
-                    print(response_llm)
-                    row_data = dict_to_row(response_llm, headers)
-                    for col_index in range(len(headers)):
-                        if row_data[col_index] and headers[col_index] != "slug":
-                            try:
-                                worksheet.update_cell(index + 2, col_index + 1, row_data[col_index])
-                            except Exception as e:
-                                print(f"Ошибка при работе с Google Sheets: {e}")
-
-                else:
-                    print('Не удалось получить ответ от нейронки')
-
             except Exception as e:
                 print(f"Error: {e}")
+
+            if response_llm:
+                response_llm = result_to_json(response_llm)
+                print("Ответ:")
+                print(response_llm)
+                row_data = dict_to_row(response_llm, headers)
+                for col_index in range(len(headers)):
+                    if row_data[col_index] and headers[col_index] != "slug":
+                        try:
+                            worksheet.update_cell(index + 2, col_index + 1, row_data[col_index])
+                        except Exception as e:
+                            print(f"Ошибка при работе с Google Sheets: {e}")
+
+            else:
+                print('Не удалось получить ответ от llm')
+
 
         print(f"Лист '{worksheet_title}' успешно обработан.")
 
