@@ -13,3 +13,4 @@ test/
 content_generator/venv
 content_generator/exp
 credentials.json
+content_generator/__pycache__/**

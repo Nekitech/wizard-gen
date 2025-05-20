@@ -1,10 +1,10 @@
 import path from 'node:path';
 import * as process from 'node:process';
-import * as prompt from '@clack/prompts';
 import { log, spinner } from '@clack/prompts';
 import fs from 'fs-extra';
+import { LISTS } from '../constants';
+import { Excel } from '../gsheets/excel';
 import { call_python_with_spinner } from '../helpers/call_python';
-import { isEmpty } from '../helpers/validation';
 
 /**
  * Записывает новую коллекцию в файл config.ts.
@@ -55,40 +55,24 @@ function write_to_config(collectionName: string, collectionCode: string): void {
 	}
 }
 
-export async function generate_collection() {
+export async function generate_collection(gsh: Excel) {
 	try {
-		const result = await prompt.group({
-			typePage: () =>
-				prompt.text({
-					message: 'Тип страницы',
-				}),
-			fieldsPage: () =>
-				prompt.text({
-					message: 'Перечислите поля, которые должны быть у сущности',
-					placeholder: 'через запятую, без пробелов',
-					validate: (value) => {
-						if (isEmpty(value)) {
-							log.error('Значение не должно быть пустым');
-							return new Error('Значение не должно быть пустым');
-						}
-						return;
-					},
-				}),
-			typeFields: async () => {
-				// const name_fields = result.results.fieldsPage?.split(',') ?? [];
-				// return await getNestedFieldTypes(name_fields, 1);
-			},
-		}, {
-			onCancel: () => {
-				prompt.cancel('Операция отменена.');
-				process.exit(0);
-			},
-		});
+		const types_fields = await gsh.getGroupedRowsByField(LISTS.structure_data, 1, 'type');
+
 		const s = spinner();
 		s.start('Обработка запроса Gemini');
-		const result_call = await call_python_with_spinner('collection_gen.py', 'generate_collection', JSON.stringify(result)) as string;
-		const code_collection = JSON.parse(result_call)?.collection ?? '';
-		write_to_config(result.typePage, code_collection);
+
+		for (const page_type in types_fields) {
+			const data = {
+				type: page_type,
+				list_fields: types_fields[page_type],
+			};
+			const result_call = await call_python_with_spinner('collection_gen.py', 'generate_collection', JSON.stringify(data)) as string;
+
+			const code_collection = JSON.parse(result_call)?.collection ?? '';
+			write_to_config(page_type, code_collection);
+		}
+
 		s.stop('Gemini завершил обработку, коллекция записана в config.ts');
 	} catch (e) {
 		log.error(e?.message);
