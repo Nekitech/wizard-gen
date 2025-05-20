@@ -5,7 +5,6 @@ dist/**
 .turbo
 .changeset
 creds.json
-__pycache__
 
 # папка для тестирования генерации файлов
 src/content/**/*.*
