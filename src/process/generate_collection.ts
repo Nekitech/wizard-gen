@@ -1,10 +1,11 @@
 import path from 'node:path';
 import * as process from 'node:process';
-import { log, spinner } from '@clack/prompts';
+import { spinner } from '@clack/prompts';
 import fs from 'fs-extra';
 import { LISTS } from '../constants';
 import { Excel } from '../gsheets/excel';
 import { call_python_with_spinner } from '../helpers/call_python';
+import { logError } from '../helpers/error_loger';
 
 /**
  * Записывает новую коллекцию в файл config.ts.
@@ -34,7 +35,7 @@ function write_to_config(collectionName: string, collectionCode: string): void {
 
 		if (exportMatch) {
 			// если export const collections уже существует, обновляем его
-			const existingExports = exportMatch[1].trim();
+			const existingExports = exportMatch[1]?.trim() ?? '';
 			const newExport = `  ${collectionName}: ${collectionName}Collection,`;
 			const updatedExports = `export const collections = {\n${existingExports}\n${newExport}\n};`;
 
@@ -51,7 +52,7 @@ function write_to_config(collectionName: string, collectionCode: string): void {
 
 		console.log(`Коллекция "${collectionName}" успешно добавлена в config.ts.`);
 	} catch (error) {
-		console.error(`Ошибка при записи в config.ts: ${error.message}`);
+		logError(`Ошибка при записи в config.ts:`, error);
 	}
 }
 
@@ -75,7 +76,7 @@ export async function generate_collection(gsh: Excel) {
 
 		s.stop('Gemini завершил обработку, коллекция записана в config.ts');
 	} catch (e) {
-		log.error(e?.message);
+		logError('Ошибка при генерации коллекций: ', e);
 		process.exit(0);
 	}
 }

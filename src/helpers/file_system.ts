@@ -63,7 +63,18 @@ export function readFile(filePath: string) {
 	}
 }
 
-export function clearFolder(folderPath: string) {
+/**
+ * Рекурсивно очищает содержимое указанной папки, исключая файлы и папки из списка игнорирования.
+ *
+ * @param {string} folderPath - Путь к папке, которую необходимо очистить.
+ * @param {string[]} [ignoreList] - Список имён файлов и папок, которые нужно пропустить при удалении.
+ *
+ * @example
+ * clearFolder('./tmp', ['.gitkeep', 'important.txt']);
+ *
+ * // Удалит всё содержимое папки ./tmp, кроме файлов .gitkeep и important.txt
+ */
+export function clearFolder(folderPath: string, ignoreList: string[] = []) {
 	try {
 		if (!fs.existsSync(folderPath)) {
 			log.warn(`Папка ${folderPath} не существует.`);
@@ -73,24 +84,29 @@ export function clearFolder(folderPath: string) {
 		const items = fs.readdirSync(folderPath);
 
 		for (const item of items) {
+			if (ignoreList.includes(item)) {
+				log.info(`Пропущен ${item} (в списке исключений).`);
+				continue;
+			}
+
 			const itemPath = path.join(folderPath, item);
 
 			try {
 				const isDirectory = fs.statSync(itemPath).isDirectory();
 
 				if (isDirectory) {
-					clearFolder(itemPath);
+					clearFolder(itemPath, ignoreList);
 					fs.rmdirSync(itemPath);
 				} else {
 					fs.unlinkSync(itemPath);
 				}
 			} catch (error: any) {
-				log.error(`Ошибка при обработке ${itemPath}:`, error?.message);
+				log.error(`Ошибка при обработке ${itemPath}: ${error?.message}`);
 			}
 		}
 
-		log.info(`Папка ${folderPath} очищена.`);
+		log.info(`Папка ${folderPath} очищена`);
 	} catch (error: any) {
-		log.error(`Ошибка при очистке папки ${folderPath}:`, error?.message);
+		log.error(`Ошибка при очистке папки ${folderPath}: ${error?.message}`);
 	}
 }

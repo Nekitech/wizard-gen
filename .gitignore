@@ -14,3 +14,4 @@ content_generator/venv
 credentials.json
 content_generator/__pycache__/**
 content_generator/.python-version
+.qodo

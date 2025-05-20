@@ -36,10 +36,13 @@ export async function call_python(path_python_file: string, name_function: strin
 		const absolute_path_python_file = path.join(__dirname, '..', 'content_generator', path_python_file);
 
 		const pythonBinPath = getPythonBinPath();
+		console.log(pythonBinPath);
+		py.fixlink('/usr/lib/python3.13/lib-dynload/_struct.cpython-313-x86_64-linux-gnu.so');
 		py.setPythonExecutable(pythonBinPath);
 
 		const pythonPackagesPath = getPythonPackagesPath('3.13');
 		py.addImportPath(pythonPackagesPath);
+		console.log(pythonPackagesPath);
 
 		py.import(absolute_path_python_file, false)
 			.then((pymodule) => {
