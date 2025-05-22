@@ -3,13 +3,22 @@ import path from 'node:path';
 import process from 'node:process';
 import * as prompt from '@clack/prompts';
 import { cancel, confirm, group, isCancel, log, select, spinner, text } from '@clack/prompts';
-import { startTemplateByName } from '../functions/start_tempalte';
-import { checkOrCreateScheme, SCHEME_FILE } from '../functions/wizard-folder';
+import { LISTS } from '../constants';
+import { Excel } from '../gsheets/excel';
 import { call_python_with_spinner } from '../helpers/call_python';
 import { getDirectories, readFile } from '../helpers/file_system';
 import { isEmpty } from '../helpers/validation';
-import { connectGoogleApiTable } from '../services/gsheets/connect';
+import { generate_collection } from '../process/generate_collection';
+import { getScheme, SCHEME_FILE } from '../process/wizard-folder';
+import { startTemplateByName } from '../template_module';
 import { TStructureDataItem } from '../types/types';
+import { update_md_content } from './update_md_content';
+
+type TPagesData = {
+	type: string;
+	description: string;
+
+};
 
 /**
  * Запрашивает у пользователя названия страниц и их описания.
@@ -28,7 +37,7 @@ async function types_pages() {
 	}) as string;
 
 	const pages: string[] = result.split(',');
-	const pagesData = [];
+	const pagesData: TPagesData[] = [];
 
 	for (const page of pages) {
 		const description: string = await prompt.text({
@@ -170,14 +179,8 @@ async function semantic_core() {
 	}
 }
 
-export async function generate_project() {
+export async function generate_project(gsh: Excel) {
 	const s = spinner();
-	const LISTS = {
-		semantic_core: 'semantic_core',
-		types_pages: 'types_pages',
-		structure_data: 'structure_data',
-		pages: 'pages_',
-	};
 	const templates_options = getDirectories('templates').map((name) => {
 		return {
 			label: name,
@@ -185,9 +188,7 @@ export async function generate_project() {
 		};
 	});
 
-	let scheme_site = await checkOrCreateScheme();
-
-	const gsh = await connectGoogleApiTable();
+	let scheme_site = await getScheme();
 
 	if (!scheme_site) {
 		scheme_site = await group({
@@ -231,6 +232,9 @@ export async function generate_project() {
 			},
 		});
 	}
+	s.message('Очищаем старые листы: ');
+
+	await gsh.deleteAllSheets([LISTS.semantic_core, LISTS.structure_data, LISTS.types_pages]);
 
 	s.start('Создание и заполнение листов');
 
@@ -269,7 +273,18 @@ export async function generate_project() {
 		await gsh.createOrGetSheet(`${LISTS.pages}${page.type}`, fields);
 	}
 
+	// генерация slug'ов
+	await call_python_with_spinner('slug_gen.py', 'main');
+	await call_python_with_spinner('main_gen.py', 'main');
+
 	s.stop('Создание и заполнение листов завершено');
+
+	// обновление .md файлов контента
+	await update_md_content(gsh);
+
+	// генерация коллекций
+	await generate_collection(gsh);
+
 	log.step(JSON.stringify(scheme_site, null, 4));
 
 	await call_python_with_spinner('slug_gen.py', 'main');

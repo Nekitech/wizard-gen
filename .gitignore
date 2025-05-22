@@ -5,9 +5,13 @@ dist/**
 .turbo
 .changeset
 creds.json
+.env
 
 # папка для тестирования генерации файлов
 src/content/**/*.*
 test/
 content_generator/venv
 credentials.json
+content_generator/__pycache__/**
+content_generator/.python-version
+.qodo
