@@ -6,10 +6,8 @@ API=
 MODEL=
 LLM_PROVIDER=
 
-#Пути до темплейтов (абсолютные)
-MAIN_GEN_TEMPLATE_PATH=
-COMS_TEMPLATE_PATH=
-SLUG_TEMPLATE_PATH=
+#Путь до темплейтов (абсолютный)
+TEMPLATE_PATH=
 
 #Название тайтла
 TITLE=

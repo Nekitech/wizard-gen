@@ -52,8 +52,8 @@ def main():
         worksheet_title = worksheet.title
         data = worksheet.get_all_records()
         headers = worksheet.row_values(1)
-        main_gen_template_path = os.getenv("MAIN_GEN_TEMPLATE_PATH")
-        template = read_template(main_gen_template_path)
+        main_gen_template_path = os.getenv("TEMPLATE_PATH")
+        template = read_template(main_gen_template_path, "main")
         if worksheet_title == "page_index":
             slug = "index"
             page_description = "это главная страница сайта"

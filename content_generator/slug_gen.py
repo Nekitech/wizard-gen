@@ -7,7 +7,7 @@ sys.path.append(project_root)
 from dotenv import load_dotenv
 
 from content_generator.constants import ListsNames
-from content_generator.helpers import result_to_json, get_google_sheet, dict_to_row, read_template
+from content_generator.helpers import result_to_json, get_google_sheet, read_template
 
 from llm_module import send_to_llm
 
@@ -57,8 +57,8 @@ def main():
 
         print(f"Обработка листа '{worksheet_title}'...")
         description_of_page = page_types.get(worksheet_title, '')
-        slug_template_path = os.getenv("SLUG_TEMPLATE_PATH")
-        template = read_template(slug_template_path)
+        slug_template_path = os.getenv("TEMPLATE_PATH")
+        template = read_template(slug_template_path, "slug")
         try:
             template = template.format(
                 worksheet_title=worksheet_title,

@@ -45,8 +45,8 @@ def main():
                 print(f"Пропускаю строку {index + 1}: отсутствуют slug или keywords.")
                 continue
             title = os.getenv("TITLE")
-            coments_template_path = os.getenv("COMS_TEMPLATE_PATH")
-            template = read_template(coments_template_path)
+            coments_template_path = os.getenv("TEMPLATE_PATH")
+            template = read_template(coments_template_path, "comments")
             try:
                 template = template.format(
                     title=title,
