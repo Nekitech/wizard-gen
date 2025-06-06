@@ -44,9 +44,9 @@ class GigaChatAdapter(LLMAdapter):
             return ""
 
 class OpenaiAdapter(LLMAdapter):
-    def __init__(self, model: str = "gpt-4-turbo"):
+    def __init__(self, credentials: str, model: str = "gpt-4-turbo"):
         self.model = ChatOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY"),
+            api_key=credentials,
             model=model
         )
     
