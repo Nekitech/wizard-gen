@@ -3,3 +3,7 @@ google-auth-oauthlib==1.2.1
 google-auth-httplib2== 0.2.0
 requests==2.32.3
 python-dotenv==1.0.1
+langchain-core 
+langchain-google-genai 
+langchain-gigachat
+langchain_openai
