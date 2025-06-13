@@ -7,17 +7,13 @@ sys.path.append(project_root)
 from content_generator.constants import ListsNames
 
 from dotenv import load_dotenv
-import time
 
-from content_generator.helpers import result_to_json, get_google_sheet
-# from helpers import result_to_json
-from llm_module import send_to_gemini
+from content_generator.helpers import result_to_json, get_google_sheet, dict_to_row, read_template
+from llm_module import send_to_llm
 
 load_dotenv(".env")
 
 
-def dict_to_row(data_dict, headers):
-    return [str(data_dict.get(header, "")) for header in headers]
 
 
 def main():
@@ -28,6 +24,7 @@ def main():
     semantic_core_data = semantic_core_worksheet.col_values(1)
     semantic_core = [item.strip() for item in semantic_core_data if item.strip()]
     semantic_core = semantic_core[1:]
+    title = os.getenv("TITLE")
     print(f"Семантическое ядро собрано: {len(semantic_core)} элементов.")
 
     # Шаг 2: Сбор типов страниц и их описаний (второй лист)
@@ -55,7 +52,11 @@ def main():
         worksheet_title = worksheet.title
         data = worksheet.get_all_records()
         headers = worksheet.row_values(1)
+        main_gen_template_path = os.getenv("TEMPLATE_PATH")
+        template = read_template(main_gen_template_path, "main")
         if worksheet_title == "page_index":
+            slug = "index"
+            page_description = "это главная страница сайта"
             desc = {
                 "description": "Описание главной страницы",
                 "h1": "Заголовок на странице",
@@ -63,20 +64,35 @@ def main():
                 "text": "Текст страницы с описанием тайтла",
                 "url": "url",
             }
-            template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о сериале. 
-                Cемантическое ядро: {semantic_core}
-                Описание страницы: это главная страница сайта
-                Нужно сгенерировать поля: {desc}
-                Ответ на запрос верни в формате json. 
-                Имена актеров и персонажей, названия тайтла и серий должны быть на русском.
-"""
-            response_gemini = send_to_gemini(template)
+            try:
+                template = template.format(
+                    title=title,
+                    semantic_core=semantic_core,
+                    page_title=page_description,
+                    slug=slug,
+                    page_description=desc
+                )
+            except Exception as e:
+                raise Exception(f"Wrong format of template, expected other params. {str(e)}")
+#             template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о тайтле. 
+#                 Тайтл: {title}
+#                 Cемантическое ядро: {semantic_core}
+#                 Описание страницы: это главная страница сайта
+#                 Нужно сгенерировать поля: {desc}
+#                 Ответ на запрос верни в формате json. 
+#                 Имена актеров и персонажей, названия тайтла и серий должны быть на русском.
+# """
+            try:
+                response = send_to_llm(template)
+            except Exception as e:
+                response = None
+                print(f"Exeption occured: {e}")
 
-            if response_gemini:
-                response_gemini = result_to_json(response_gemini)
+            if response:
+                response = result_to_json(response)
                 print("Ответ:")
-                print(response_gemini)
-                row_data = dict_to_row(response_gemini, headers)
+                print(response)
+                row_data = dict_to_row(response, headers)
                 for col_index in range(len(headers)):
                     if row_data[col_index] and headers[col_index] != "slug":
                         try:
@@ -84,9 +100,9 @@ def main():
                         except Exception as e:
                             print(f"Ошибка при работе с Google Sheets: {e}")
             else:
-                print("error :(")
-            time.sleep(5)
+                print("LLM returned wrong response")
             continue
+        
         worksheet_title = worksheet_title[5:]
         worksheet_title = worksheet_title.lstrip("_")
         if worksheet_title not in page_types:
@@ -103,26 +119,36 @@ def main():
         # Получаем данные со второго и третьего столбца (slug и keywords)
         for index, row in enumerate(data):
             slug = row.get("slug", "")
-            # keywords = row.get('keywords', '')
-            # Ключевые слова: {keywords}
+            page_title = page_types.get(worksheet_title, "")
+            page_description = descriptions.get(worksheet_title, {})
+            try:
+                template = template.format(
+                    title=title,
+                    semantic_core=semantic_core,
+                    page_title=page_title,
+                    slug=slug,
+                    page_description=page_description
+                )
+            except Exception as e:
+                raise Exception(f"Wrong format of template, expected other params. {str(e)}")
+            # template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о тайтле. 
+            #     Тайтл: {title}
+            #     Cемантическое ядро: {semantic_core}
+            #     Описание страницы: {page_title}
+            #     Для страницы: {slug}
+            #     Нужно сгенерировать поля: {page_description}
+            #     Ответ на запрос верни в формате json. """
 
-            # if not slug or not keywords:
-            #     print(f"Пропускаю строку {index + 1}: отсутствуют slug или keywords.")
-            #     continue
+            # Отправка запроса в llm
+            try:
+                response = send_to_llm(template)
+            except Exception as e:
+                response = None
+                print(f"Exeption occured: {e}")
 
-            template = f"""Сгенерируй контент на основе ключевых слов, семантического ядра и твоих знаний о сериале. 
-                Cемантическое ядро: {semantic_core}
-                Описание страницы: {page_types.get(worksheet_title, "")}
-                Для страницы: {slug}
-                Нужно сгенерировать поля: {descriptions.get(worksheet_title, {})}
-                Ответ на запрос верни в формате json. """
-
-            # Отправка запроса в Gemini
-            response_gemini = send_to_gemini(template)
-
-            if response_gemini:
-                response_gemini = result_to_json(response_gemini)
-                row_data = dict_to_row(response_gemini, headers)
+            if response:
+                response = result_to_json(response)
+                row_data = dict_to_row(response, headers)
                 for col_index in range(len(headers)):
                     if row_data[col_index] and headers[col_index] != "slug":
                         try:
@@ -132,8 +158,7 @@ def main():
                         except Exception as e:
                             print(f"Ошибка при работе с Google Sheets: {e}")
             else:
-                print("error :(")
-            time.sleep(5)
+                print("LLM returned wrong response")
 
         print(f"Лист '{worksheet_title}' успешно обработан.")
 
