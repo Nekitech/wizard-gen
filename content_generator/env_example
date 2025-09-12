@@ -1,8 +1,16 @@
 GOOGLE_SHEET_URL=#ссылка на таблицу (без /share )
 GEMINIAPI=#api-ключ (пока гемини, позже в зависимости от модели)
 
+#LLM API
+API=
+MODEL=
+LLM_PROVIDER=
+
+#Путь до темплейтов (абсолютный)
+TEMPLATE_PATH=
+
 #Название тайтла
-TYTLE=
+TITLE=
 
 #Структура полностью копирует структуру credentials.json, значения переносить из него
 CREDENTIALS_TYPE=
@@ -16,3 +24,4 @@ CREDENTIALS_TOKEN_URI=
 CREDENTIALS_AUTH_PROVIDER_X509_CERT_URL=
 CREDENTIALS_CLIENT_X509_CERT_URL=
 CREDENTIALS_UNIVERSE_DOMAIN=
+

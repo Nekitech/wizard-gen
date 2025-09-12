@@ -11,6 +11,7 @@ creds.json
 src/content/**/*.*
 test/
 content_generator/venv
+content_generator/exp
 credentials.json
 content_generator/__pycache__/**
 content_generator/.python-version
